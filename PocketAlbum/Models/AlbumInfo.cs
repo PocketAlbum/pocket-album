@@ -1,4 +1,4 @@
-﻿namespace PocketAlbum;
+namespace PocketAlbum.Models;
 
 public class AlbumInfo
 {
@@ -6,4 +6,5 @@ public class AlbumInfo
     public int DateCount { get; init; }
     public long ThumbnailsSize { get; init; }
     public long ImagesSize { get; init; }
+    public required List<int> Years { get; init; }
 }

@@ -1,4 +1,4 @@
-﻿namespace PocketAlbum;
+namespace PocketAlbum.Models;
 
 public class ImageInfo
 {
@@ -10,7 +10,7 @@ public class ImageInfo
 
     public required int Width { get; init; }
 
-    public required int Height {  get; init; }
+    public required int Height { get; init; }
 
     public required long Size { get; init; }
 

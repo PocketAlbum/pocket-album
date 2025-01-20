@@ -1,3 +1,5 @@
+using PocketAlbum.Models;
+
 namespace PocketAlbum;
 
 public interface IAlbum
@@ -8,7 +10,15 @@ public interface IAlbum
 
     Task<List<ImageThumbnail>> GetImages(int from, int to);
 
+    Task<List<ImageThumbnail>> GetImages(int year);
+
     Task<bool> ImageExists(string id);
 
     Task Insert(ImageInfo image, byte[] thumbnail, byte[] data);
+
+    Task<List<YearIndex>> GetYearIndex();
+
+    Task StoreYearIndex(YearIndex yearIndex);
+
+    Task RemoveYearIndex(int year);
 }

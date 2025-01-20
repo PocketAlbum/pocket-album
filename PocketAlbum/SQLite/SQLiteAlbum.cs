@@ -1,3 +1,4 @@
+using PocketAlbum.Models;
 using SQLite;
 
 namespace PocketAlbum.SQLite;
@@ -15,11 +16,15 @@ public class SQLiteAlbum : IAlbum
     {
         var db = new SQLiteAsyncConnection(path, false);
         await db.CreateTableAsync<SQLiteImage>();
+        await db.CreateTableAsync<SQLiteYearIndex>();
         return new SQLiteAlbum(db);
     }
 
     public async Task<AlbumInfo> GetInfo()
     {
+        var years = await Connection.QueryScalarsAsync<int>(
+            "SELECT DISTINCT substr(\"Created\", 1, 4) FROM Image");
+        
         return new AlbumInfo()
         {
             ImageCount = await Connection.Table<SQLiteImage>().CountAsync(),
@@ -28,7 +33,8 @@ public class SQLiteAlbum : IAlbum
             ThumbnailsSize = await QueryNumber(
                 "SELECT SUM(LENGTH(Thumbnail)) FROM Image"),
             ImagesSize = await QueryNumber(
-                "SELECT SUM(LENGTH(Data)) FROM Image")
+                "SELECT SUM(LENGTH(Data)) FROM Image"),
+            Years = years
         };
     }
 
@@ -110,5 +116,49 @@ public class SQLiteAlbum : IAlbum
             return 0;
         }
         return Convert.ToInt64(q.FirstOrDefault());
+    }
+
+    public async Task<List<ImageThumbnail>> GetImages(int year)
+    {
+        var images = await Connection.QueryAsync<SQLiteImage>(
+            "SELECT \"Id\", \"Filename\", \"Created\", \"Width\", " +
+            "\"Height\", \"Size\", \"Latitude\", \"Longitude\", " +
+            "\"Checksum\", \"Thumbnail\"" +
+            "FROM Image " +
+            $"WHERE Created LIKE '{year}-%' " +
+            "ORDER BY Created DESC ");
+
+        return images.Select(i => new ImageThumbnail()
+        {
+            Info = ConvertImage(i),
+            Thumbnail = i.Thumbnail!
+        }).ToList();
+    }
+
+    public async Task StoreYearIndex(YearIndex yearIndex)
+    {
+        await Connection.InsertAsync(new SQLiteYearIndex()
+        {
+            Year = yearIndex.Year,
+            Count = yearIndex.Count,
+            Checksum = yearIndex.Checksum
+        });
+    }
+
+    public async Task<List<YearIndex>> GetYearIndex()
+    {
+        var index = await Connection.Table<SQLiteYearIndex>().ToListAsync();
+
+        return index.Select(i => new YearIndex()
+        {
+            Year = i.Year!.Value,
+            Count = i.Count!.Value,
+            Checksum = i.Checksum!
+        }).ToList();
+    }
+
+    public async Task RemoveYearIndex(int year)
+    {
+        await Connection.DeleteAsync<SQLiteYearIndex>(year);
     }
 }

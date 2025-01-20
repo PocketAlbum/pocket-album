@@ -1,4 +1,4 @@
-﻿namespace PocketAlbum;
+namespace PocketAlbum.Models;
 
 public class ImageThumbnail
 {

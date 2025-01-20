@@ -29,9 +29,25 @@ internal class Program
     static async Task Run(string albumPath)
     {
         IAlbum album = await SQLiteAlbum.Open(albumPath);
+
+        IntegrityChecker checker = new IntegrityChecker(album);
+        await CheckIndex(checker);
+
         ImageImporter importer = new ImageImporter(album);
-        var info = await album.GetInfo();
         await AddRecursively(importer, GetImagesLocation());
+
+        Console.WriteLine("Import finished, starting to build index");
+
+        await CheckIndex(checker);
+    }
+
+    static async Task CheckIndex(IntegrityChecker checker)
+    {
+        foreach (var year in await checker.InvalidYears())
+        {
+            Console.WriteLine("Indexing year " + year);
+            await checker.CheckYear(year);
+        }
     }
 
     static string GetImagesLocation()

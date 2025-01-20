@@ -1,8 +1,8 @@
+using PocketAlbum.Models;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using SixLabors.ImageSharp.Processing;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace PocketAlbum;
 
@@ -10,6 +10,7 @@ public class ImageImporter
 {
     private readonly IAlbum album;
     private readonly ImportSettings settings;
+    private readonly List<int> years = new List<int>();
 
     public ImageImporter(IAlbum album, ImportSettings? settings = null)
     {
@@ -22,7 +23,7 @@ public class ImageImporter
         using (var stream = new FileStream(path, FileMode.Open))
         {
             var shaBytes = await SHA256.HashDataAsync(stream);
-            var checksum = ByteArrayToString(shaBytes);
+            var checksum = Utilities.ByteArrayToString(shaBytes);
 
             if (await album.ImageExists(checksum))
             {
@@ -55,7 +56,7 @@ public class ImageImporter
 
                 var coordinates = TryParseCoordinates(exif);
 
-                var imported = new ImageInfo()
+                var imported = new Models.ImageInfo()
                 {
                     Id = checksum,
                     Filename = Path.GetFileName(path),
@@ -66,6 +67,11 @@ public class ImageImporter
                     Latitude = coordinates?.lat,
                     Longitude = coordinates?.lon
                 };
+
+                if (!years.Contains(imported.Created.Year))
+                {
+                    await album.RemoveYearIndex(imported.Created.Year);
+                }
 
                 image.Mutate(i => i.AutoOrient());
 
@@ -90,16 +96,6 @@ public class ImageImporter
         var lon = exif.TryGetCoordinate("GPSLongitude");
 
         return lat != null && lon != null ? (lat.Value, lon.Value) : null;
-    }
-
-    private static string ByteArrayToString(byte[] array)
-    {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < array.Length; i++)
-        {
-            builder.Append($"{array[i]:X2}");
-        }
-        return builder.ToString();
     }
 
     public class ImportException : Exception
