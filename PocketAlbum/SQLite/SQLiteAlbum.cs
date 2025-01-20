@@ -1,4 +1,4 @@
-﻿using SQLite;
+using SQLite;
 
 namespace PocketAlbum.SQLite;
 
@@ -32,22 +32,6 @@ public class SQLiteAlbum : IAlbum
         };
     }
 
-    public async Task<ImageInfo> GetImage(string id)
-    {
-        var image = (await Connection.QueryAsync<SQLiteImage>(
-            "select \"Id\", \"Filename\", \"Created\", \"Width\", " +
-            "\"Height\", \"Size\", \"Latitude\", \"Longitude\", " +
-            "\"Checksum\" from Image where Id = ?", id))
-            .FirstOrDefault();
-        
-        if (image == null)
-        {
-            throw new ApplicationException($"Image with id {id} not found");
-        }
-
-        return ConvertImage(image);
-    }
-
     public async Task<List<ImageThumbnail>> GetImages(int from, int to)
     {
         if (to < from)
@@ -68,13 +52,6 @@ public class SQLiteAlbum : IAlbum
             Info = ConvertImage(i),
             Thumbnail = i.Thumbnail!
         }).ToList();
-    }
-
-    public async Task<byte[]> GetThumbnail(string id)
-    {
-        var image = await Connection.Table<SQLiteImage>()
-            .FirstAsync(x => x.Id == id);
-        return image.Thumbnail!;
     }
 
     public async Task<byte[]> GetData(string id)

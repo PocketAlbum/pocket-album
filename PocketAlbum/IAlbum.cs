@@ -1,12 +1,8 @@
-﻿namespace PocketAlbum;
+namespace PocketAlbum;
 
 public interface IAlbum
 {
     Task<AlbumInfo> GetInfo();
-
-    Task<ImageInfo> GetImage(string id);
-
-    Task<byte[]> GetThumbnail(string id);
 
     Task<byte[]> GetData(string id);
 
