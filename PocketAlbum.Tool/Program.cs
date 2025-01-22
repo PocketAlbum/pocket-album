@@ -16,29 +16,31 @@ internal class Program
         {
             Console.WriteLine($"File named {args[0]} not found");
         }
-        try
-        {
-            Run(args[0]).Wait();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
+
+        Run(args[0]).Wait();
     }
 
     static async Task Run(string albumPath)
     {
-        IAlbum album = await SQLiteAlbum.Open(albumPath);
+        try
+        {
+            IAlbum album = await SQLiteAlbum.Open(albumPath);
 
-        IntegrityChecker checker = new IntegrityChecker(album);
-        await CheckIndex(checker);
+            IntegrityChecker checker = new IntegrityChecker(album);
+            await CheckIndex(checker);
 
-        ImageImporter importer = new ImageImporter(album);
-        await AddRecursively(importer, GetImagesLocation());
+            ImageImporter importer = new ImageImporter(album);
+            await AddRecursively(importer, GetImagesLocation());
 
-        Console.WriteLine("Import finished, starting to build index");
+            Console.WriteLine("Import finished, starting to build index");
 
-        await CheckIndex(checker);
+            await CheckIndex(checker);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            Console.WriteLine(e.StackTrace);
+        }
     }
 
     static async Task CheckIndex(IntegrityChecker checker)

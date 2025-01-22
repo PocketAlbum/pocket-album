@@ -6,5 +6,7 @@ public class YearIndex
 
     public required int Count { get; init; }
 
-    public required string Checksum { get; init; }
+    public required uint Crc { get; init; }
+
+    public required ulong Size { get; init; }
 }

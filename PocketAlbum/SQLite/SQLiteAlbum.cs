@@ -48,7 +48,7 @@ public class SQLiteAlbum : IAlbum
         var images = await Connection.QueryAsync<SQLiteImage>(
             "SELECT \"Id\", \"Filename\", \"Created\", \"Width\", " +
             "\"Height\", \"Size\", \"Latitude\", \"Longitude\", " +
-            "\"Checksum\", \"Thumbnail\"" +
+            "\"Crc\", \"Thumbnail\" " +
             "FROM Image " +
             "ORDER BY Created DESC " +
             $"LIMIT {from}, {to - from + 1}");
@@ -96,7 +96,8 @@ public class SQLiteAlbum : IAlbum
             Latitude = image.Latitude,
             Longitude = image.Longitude,
             Thumbnail = thumbnail,
-            Data = data
+            Data = data,
+            Crc = image.Crc
         });
     }
 
@@ -124,7 +125,7 @@ public class SQLiteAlbum : IAlbum
         var images = await Connection.QueryAsync<SQLiteImage>(
             "SELECT \"Id\", \"Filename\", \"Created\", \"Width\", " +
             "\"Height\", \"Size\", \"Latitude\", \"Longitude\", " +
-            "\"Checksum\", \"Thumbnail\"" +
+            "\"Crc\", \"Thumbnail\" " +
             "FROM Image " +
             $"WHERE Created LIKE '{year}-%' " +
             "ORDER BY Created DESC ");
@@ -142,7 +143,8 @@ public class SQLiteAlbum : IAlbum
         {
             Year = yearIndex.Year,
             Count = yearIndex.Count,
-            Checksum = yearIndex.Checksum
+            Crc = yearIndex.Crc,
+            Size = yearIndex.Size
         });
     }
 
@@ -154,7 +156,8 @@ public class SQLiteAlbum : IAlbum
         {
             Year = i.Year!.Value,
             Count = i.Count!.Value,
-            Checksum = i.Checksum!
+            Crc = i.Crc!.Value,
+            Size = i.Size!.Value
         }).ToList();
     }
 

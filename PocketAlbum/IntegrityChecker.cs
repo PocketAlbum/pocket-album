@@ -1,6 +1,4 @@
 using PocketAlbum.Models;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace PocketAlbum;
 
@@ -44,7 +42,7 @@ public class IntegrityChecker
     }
 
     /// <summary>
-    /// Calculates checksum of all images from specific year and updates the index
+    /// Calculates CRCs of all images from specific year and updates the index
     /// </summary>
     /// <param name="year">year</param>
     /// <returns></returns>
@@ -59,27 +57,19 @@ public class IntegrityChecker
             return;
         }
 
-        var checksums = new MemoryStream(GenerateChecksums(images.Select(i => i.Info)));
-        var yearChecksumBytes = await SHA256.HashDataAsync(checksums);
-        var yearChecksum = Utilities.ByteArrayToString(yearChecksumBytes);
+        var crcs = images
+            .OrderBy(i => i.Info.Id)
+            .Select(i => (i.Info.Crc, i.Info.Size))
+            .Aggregate((img1, img2) => {
+                var newCrc = CrcUtilities.CombineCrc32(img1.Crc, img2.Crc, img2.Size);
+                return (newCrc, img1.Size + img2.Size);
+            });
 
         await album.StoreYearIndex(new YearIndex {
             Year = year,
             Count = images.Count,
-            Checksum = yearChecksum
+            Crc = crcs.Crc,
+            Size = crcs.Size
         });
-    }
-
-    private byte[] GenerateChecksums(IEnumerable<ImageInfo> images)
-    {
-        StringBuilder sb = new StringBuilder();
-        foreach (var img in images.OrderBy(i => i.Filename))
-        {
-            sb.Append(img.Id);
-            sb.Append("  ");
-            sb.Append(img.Filename);
-            sb.Append('\n');
-        }
-        return Encoding.ASCII.GetBytes(sb.ToString());
     }
 }

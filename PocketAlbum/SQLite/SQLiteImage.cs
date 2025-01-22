@@ -21,7 +21,7 @@ public class SQLiteImage
     public int? Height { get; set; }
 
     [NotNull]
-    public long? Size { get; set; }
+    public ulong? Size { get; set; }
 
     public double? Latitude { get; set; }
 

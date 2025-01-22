@@ -12,7 +12,7 @@ public class ImageInfo
 
     public required int Height { get; init; }
 
-    public required long Size { get; init; }
+    public required ulong Size { get; init; }
 
     public double? Latitude { get; init; }
 

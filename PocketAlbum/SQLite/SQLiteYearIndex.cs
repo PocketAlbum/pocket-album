@@ -12,5 +12,8 @@ internal class SQLiteYearIndex
     public int? Count { get; set; }
 
     [NotNull]
-    public string? Checksum { get; set; }
+    public uint? Crc { get; set; }
+
+    [NotNull]
+    public ulong? Size { get; set; } 
 }

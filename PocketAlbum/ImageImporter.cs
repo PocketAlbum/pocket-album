@@ -24,9 +24,9 @@ public class ImageImporter
         using (var stream = new FileStream(path, FileMode.Open))
         {
             var shaBytes = await SHA256.HashDataAsync(stream);
-            var checksum = Utilities.ByteArrayToString(shaBytes);
+            var hash = Utilities.ByteArrayToString(shaBytes);
             
-            if (await album.ImageExists(checksum))
+            if (await album.ImageExists(hash))
             {
                 throw new ImportException("Image already exists");
             }
@@ -63,12 +63,12 @@ public class ImageImporter
 
                 var imported = new Models.ImageInfo()
                 {
-                    Id = checksum,
+                    Id = hash,
                     Filename = Path.GetFileName(path),
                     Created = exif.GetCreated(),
                     Width = image.Size.Width,
                     Height = image.Size.Height,
-                    Size = stream.Length,
+                    Size = (ulong)stream.Length,
                     Latitude = coordinates?.lat,
                     Longitude = coordinates?.lon,
                     Crc = crc.GetCurrentHashAsUInt32()
@@ -77,6 +77,7 @@ public class ImageImporter
                 if (!years.Contains(imported.Created.Year))
                 {
                     await album.RemoveYearIndex(imported.Created.Year);
+                    years.Add(imported.Created.Year);
                 }
 
                 image.Mutate(i => i.AutoOrient());
