@@ -78,7 +78,8 @@ public class SQLiteAlbum : IAlbum
             Height = sqliteImage.Height!.Value,
             Size = sqliteImage.Size!.Value,
             Latitude = sqliteImage.Latitude,
-            Longitude = sqliteImage.Longitude
+            Longitude = sqliteImage.Longitude,
+            Crc = sqliteImage.Crc!.Value
         };
     }
 

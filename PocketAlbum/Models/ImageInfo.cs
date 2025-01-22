@@ -18,4 +18,6 @@ public class ImageInfo
 
     public double? Longitude { get; init; }
 
+    public required uint Crc { get; init; }
+
 }

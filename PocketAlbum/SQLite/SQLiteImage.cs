@@ -1,4 +1,4 @@
-﻿using SQLite;
+using SQLite;
 
 namespace PocketAlbum.SQLite;
 
@@ -32,4 +32,7 @@ public class SQLiteImage
 
     [NotNull]
     public byte[]? Data { get; set; }
+
+    [NotNull]
+    public uint? Crc { get; set;  }
 }

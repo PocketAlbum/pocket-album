@@ -2,6 +2,7 @@ using PocketAlbum.Models;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using SixLabors.ImageSharp.Processing;
+using System.IO.Hashing;
 using System.Security.Cryptography;
 
 namespace PocketAlbum;
@@ -24,12 +25,12 @@ public class ImageImporter
         {
             var shaBytes = await SHA256.HashDataAsync(stream);
             var checksum = Utilities.ByteArrayToString(shaBytes);
-
+            
             if (await album.ImageExists(checksum))
             {
                 throw new ImportException("Image already exists");
             }
-
+            
             try
             {
                 stream.Seek(0, SeekOrigin.Begin);
@@ -54,6 +55,10 @@ public class ImageImporter
                     throw new ImportException("Image does not contain exif metadata");
                 }
 
+                var crc = new Crc32();
+                stream.Seek(0, SeekOrigin.Begin);
+                crc.Append(stream);
+
                 var coordinates = TryParseCoordinates(exif);
 
                 var imported = new Models.ImageInfo()
@@ -65,7 +70,8 @@ public class ImageImporter
                     Height = image.Size.Height,
                     Size = stream.Length,
                     Latitude = coordinates?.lat,
-                    Longitude = coordinates?.lon
+                    Longitude = coordinates?.lon,
+                    Crc = crc.GetCurrentHashAsUInt32()
                 };
 
                 if (!years.Contains(imported.Created.Year))
