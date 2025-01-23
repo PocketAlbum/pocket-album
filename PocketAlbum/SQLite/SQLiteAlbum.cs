@@ -38,20 +38,41 @@ public class SQLiteAlbum : IAlbum
         };
     }
 
-    public async Task<List<ImageThumbnail>> GetImages(int from, int to)
+    public async Task<List<ImageThumbnail>> GetImages(FilterModel filter)
     {
-        if (to < from)
+        if (!filter.Valid)
         {
-            throw new ArgumentException("From index must be lower than to");
+            throw new ArgumentException(
+                "At least one property of filter model must be filled");
         }
 
-        var images = await Connection.QueryAsync<SQLiteImage>(
-            "SELECT \"Id\", \"Filename\", \"Created\", \"Width\", " +
+        string query = "SELECT \"Id\", \"Filename\", \"Created\", \"Width\", " +
             "\"Height\", \"Size\", \"Latitude\", \"Longitude\", " +
             "\"Crc\", \"Thumbnail\" " +
-            "FROM Image " +
-            "ORDER BY Created DESC " +
-            $"LIMIT {from}, {to - from + 1}");
+            "FROM Image ";
+
+        if (filter.Year != null)
+        {
+            if (filter.Year.SingleValue)
+            {
+                query += $"WHERE \"Created\" LIKE '{filter.Year.To}-%' ";
+            }
+            else
+            {
+                query += $"WHERE substr(\"Created\", 1, 4) >= {filter.Year.From} ";
+                query += $"AND substr(\"Created\", 1, 4) <= {filter.Year.To} ";
+            }
+        }
+
+        query += "ORDER BY Created ASC ";
+
+        if (filter.Index != null)
+        {
+            long count = filter.Index.To - filter.Index.From + 1;
+            query += $"LIMIT {filter.Index.From}, {count}";
+        }
+
+        var images = await Connection.QueryAsync<SQLiteImage>(query);
 
         return images.Select(i => new ImageThumbnail()
         {
@@ -118,23 +139,6 @@ public class SQLiteAlbum : IAlbum
             return 0;
         }
         return Convert.ToInt64(q.FirstOrDefault());
-    }
-
-    public async Task<List<ImageThumbnail>> GetImages(int year)
-    {
-        var images = await Connection.QueryAsync<SQLiteImage>(
-            "SELECT \"Id\", \"Filename\", \"Created\", \"Width\", " +
-            "\"Height\", \"Size\", \"Latitude\", \"Longitude\", " +
-            "\"Crc\", \"Thumbnail\" " +
-            "FROM Image " +
-            $"WHERE Created LIKE '{year}-%' " +
-            "ORDER BY Created DESC ");
-
-        return images.Select(i => new ImageThumbnail()
-        {
-            Info = ConvertImage(i),
-            Thumbnail = i.Thumbnail!
-        }).ToList();
     }
 
     public async Task StoreYearIndex(YearIndex yearIndex)

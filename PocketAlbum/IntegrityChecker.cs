@@ -48,7 +48,10 @@ public class IntegrityChecker
     /// <returns></returns>
     public async Task CheckYear(int year)
     {
-        var images = await album.GetImages(year);
+        var images = await album.GetImages(new FilterModel()
+        {
+            Year = new Interval(year)
+        });
 
         if (images.Count == 0)
         {

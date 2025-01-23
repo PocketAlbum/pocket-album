@@ -8,9 +8,7 @@ public interface IAlbum
 
     Task<byte[]> GetData(string id);
 
-    Task<List<ImageThumbnail>> GetImages(int from, int to);
-
-    Task<List<ImageThumbnail>> GetImages(int year);
+    Task<List<ImageThumbnail>> GetImages(FilterModel filter);
 
     Task<bool> ImageExists(string id);
 
