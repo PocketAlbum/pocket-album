@@ -46,8 +46,8 @@ public class SQLiteAlbum : IAlbum
                 "At least one property of filter model must be filled");
         }
 
-        string query = "SELECT \"Id\", \"Filename\", \"Created\", \"Width\", " +
-            "\"Height\", \"Size\", \"Latitude\", \"Longitude\", " +
+        string query = "SELECT \"Id\", \"Filename\", \"ContentType\", \"Created\", " +
+            "\"Width\", \"Height\", \"Size\", \"Latitude\", \"Longitude\", " +
             "\"Crc\", \"Thumbnail\" " +
             "FROM Image ";
 
@@ -94,6 +94,7 @@ public class SQLiteAlbum : IAlbum
         {
             Id = sqliteImage.Id!,
             Filename = sqliteImage.Filename!,
+            ContentType = sqliteImage.ContentType!,
             Created = sqliteImage.Created,
             Width = sqliteImage.Width!.Value,
             Height = sqliteImage.Height!.Value,
@@ -110,6 +111,7 @@ public class SQLiteAlbum : IAlbum
         {
             Id = image.Id,
             Filename = image.Filename,
+            ContentType = image.ContentType,
             Created = image.Created,
             Width = image.Width,
             Height = image.Height,

@@ -1,7 +1,9 @@
 using PocketAlbum.Models;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using SixLabors.ImageSharp.Processing;
+using System.IO;
 using System.IO.Hashing;
 using System.Security.Cryptography;
 
@@ -19,6 +21,23 @@ public class ImageImporter
         this.settings = settings ?? new ImportSettings();
     }
 
+    private static async Task<IImageFormat> DetectFormat(Stream stream)
+    {
+        try
+        {
+            stream.Seek(0, SeekOrigin.Begin);
+            return await Image.DetectFormatAsync(stream);
+        }
+        catch (InvalidImageContentException)
+        {
+            throw new ImportException("Invalid image content");
+        }
+        catch (UnknownImageFormatException)
+        {
+            throw new ImportException("Unknown image format");
+        }
+    }
+
     public async Task Import(string path)
     {
         using (var stream = new FileStream(path, FileMode.Open))
@@ -31,19 +50,7 @@ public class ImageImporter
                 throw new ImportException("Image already exists");
             }
             
-            try
-            {
-                stream.Seek(0, SeekOrigin.Begin);
-                var imageInfo = Image.Identify(stream);
-            }
-            catch (InvalidImageContentException)
-            {
-                throw new ImportException("Invalid image content");
-            }
-            catch (UnknownImageFormatException)
-            {
-                throw new ImportException("Unknown image format");
-            }
+            var format = await DetectFormat(stream);
 
             stream.Seek(0, SeekOrigin.Begin);
             using (var image = Image.Load(stream))
@@ -65,6 +72,7 @@ public class ImageImporter
                 {
                     Id = hash,
                     Filename = Path.GetFileName(path),
+                    ContentType = format.DefaultMimeType,
                     Created = exif.GetCreated(),
                     Width = image.Size.Width,
                     Height = image.Size.Height,

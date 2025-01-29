@@ -15,6 +15,9 @@ public class SQLiteImage
     public DateTime Created { get; set; }
 
     [NotNull]
+    public string? ContentType { get; set; }
+
+    [NotNull]
     public int? Width { get; set; }
 
     [NotNull]

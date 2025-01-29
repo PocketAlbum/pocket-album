@@ -6,6 +6,8 @@ public class ImageInfo
 
     public required string Filename { get; init; }
 
+    public required string ContentType { get; init; }
+
     public required DateTime Created { get; init; }
 
     public required int Width { get; init; }
