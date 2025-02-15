@@ -4,11 +4,11 @@ namespace PocketAlbum;
 
 public interface IAlbum
 {
-    Task<AlbumInfo> GetInfo();
+    Task<AlbumInfo> GetInfo(FilterModel filter);
 
     Task<byte[]> GetData(string id);
 
-    Task<List<ImageThumbnail>> GetImages(FilterModel filter);
+    Task<List<ImageThumbnail>> GetImages(FilterModel filter, Interval paging);
 
     Task<bool> ImageExists(string id);
 

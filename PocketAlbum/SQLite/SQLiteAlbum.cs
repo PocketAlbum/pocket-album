@@ -5,6 +5,10 @@ namespace PocketAlbum.SQLite;
 
 public class SQLiteAlbum : IAlbum
 {
+    private const string yearQuery = "CAST(substr(Created, 1, 4) AS SIGNED) AS y";
+    private const string hourQuery = "CAST(substr(Created, 12, 2) AS SIGNED) AS h";
+    private const string filterQueries = yearQuery + ", " + hourQuery;
+
     public SQLiteAsyncConnection Connection { get; }
 
     private SQLiteAlbum(SQLiteAsyncConnection connection)
@@ -20,57 +24,80 @@ public class SQLiteAlbum : IAlbum
         return new SQLiteAlbum(db);
     }
 
-    public async Task<AlbumInfo> GetInfo()
-    {
-        var years = await Connection.QueryScalarsAsync<int>(
-            "SELECT DISTINCT substr(\"Created\", 1, 4) FROM Image");
-        
-        return new AlbumInfo()
-        {
-            ImageCount = await Connection.Table<SQLiteImage>().CountAsync(),
-            DateCount = (int)await QueryNumber(
-                "SELECT COUNT(DISTINCT DATE(Created)) FROM Image"),
-            ThumbnailsSize = await QueryNumber(
-                "SELECT SUM(LENGTH(Thumbnail)) FROM Image"),
-            ImagesSize = await QueryNumber(
-                "SELECT SUM(LENGTH(Data)) FROM Image"),
-            Years = years
-        };
-    }
-
-    public async Task<List<ImageThumbnail>> GetImages(FilterModel filter)
-    {
-        if (!filter.Valid)
-        {
-            throw new ArgumentException(
-                "At least one property of filter model must be filled");
+    private string GetWhere(FilterModel filter) {
+        if (!filter.HasAny) {
+            return "TRUE";
         }
-
-        string query = "SELECT \"Id\", \"Filename\", \"ContentType\", \"Created\", " +
-            "\"Width\", \"Height\", \"Size\", \"Latitude\", \"Longitude\", " +
-            "\"Crc\", \"Thumbnail\" " +
-            "FROM Image ";
-
-        if (filter.Year != null)
-        {
-            if (filter.Year.SingleValue)
-            {
-                query += $"WHERE \"Created\" LIKE '{filter.Year.To}-%' ";
+        var conditions = new List<string>();
+        if (filter.Year != null) {
+            if (filter.Year.SingleValue) {
+                conditions.Add($"y = {filter.Year.To}");
             }
             else
             {
-                query += $"WHERE substr(\"Created\", 1, 4) >= {filter.Year.From} ";
-                query += $"AND substr(\"Created\", 1, 4) <= {filter.Year.To} ";
+                conditions.Add($"y >= {filter.Year.From} AND y <= {filter.Year.To}");
             }
         }
-
-        query += "ORDER BY Created ASC ";
-
-        if (filter.Index != null)
+        var time = filter.TimeOfDay switch
         {
-            long count = filter.Index.To - filter.Index.From + 1;
-            query += $"LIMIT {filter.Index.From}, {count}";
+            FilterModel.TimesOfDay.Morning => "h >= 6 AND h < 12",
+            FilterModel.TimesOfDay.Afternoon => "h >= 12 AND h < 18",
+            FilterModel.TimesOfDay.Evening => "h >= 18",
+            FilterModel.TimesOfDay.Night => "h < 6",
+            _ => null
+        };
+        if (time != null)
+        {
+            conditions.Add(time);
         }
+        return string.Join(" AND ", conditions);
+    }
+
+    private class YearsQuery
+    {
+        [Column("COUNT(*)")]
+        public int Count { get; set; }
+        [Column("y")]
+        public int Year { get; set; }
+    }
+
+    public async Task<AlbumInfo> GetInfo(FilterModel filter)
+    {
+        string where = "WHERE " + GetWhere(filter);
+        
+        var years = await Connection.QueryAsync<YearsQuery>(
+            $"SELECT COUNT(*), {filterQueries} FROM Image {where} GROUP BY y");
+
+        return new AlbumInfo()
+        {
+            ImageCount = years.Sum(y => y.Count),
+            DateCount = (int)await QueryNumber(
+                $"SELECT COUNT(DISTINCT DATE(Created)), {filterQueries} " +
+                $"FROM Image {where}"),
+            ThumbnailsSize = await QueryNumber(
+                $"SELECT SUM(LENGTH(Thumbnail)), {filterQueries} " +
+                $"FROM Image {where}"),
+            ImagesSize = await QueryNumber(
+                $"SELECT SUM(LENGTH(Data)), {filterQueries} " +
+                $"FROM Image {where}"),
+            Years = years
+                .Select(y => new YearIndex(){
+                    Year = y.Year, Count = y.Count, Crc = 0, Size = 0
+                })
+                .ToList()
+        };
+    }
+
+    public async Task<List<ImageThumbnail>> GetImages(FilterModel filter, Interval paging)
+    {
+        long count = paging.To - paging.From + 1;
+
+        string query = "SELECT \"Id\", \"Filename\", \"ContentType\", \"Created\", " +
+            "\"Width\", \"Height\", \"Size\", \"Latitude\", \"Longitude\", " +
+            "\"Crc\", \"Thumbnail\", " + filterQueries + " FROM Image " +
+            $"WHERE {GetWhere(filter)} " +
+            "ORDER BY Created ASC " +
+            $"LIMIT {paging.From}, {count}";
 
         var images = await Connection.QueryAsync<SQLiteImage>(query);
 

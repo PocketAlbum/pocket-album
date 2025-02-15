@@ -11,9 +11,17 @@ public class FilterModel
     public Interval? Year { get; set; }
 
     /// <summary>
-    /// Include images within specified index, ordered chronologically
+    /// Include images taken at specified time of day
     /// </summary>
-    public Interval? Index { get; set; }
+    public TimesOfDay? TimeOfDay { get; set; }
 
-    public bool Valid => Year != null || Index != null;
+    public bool HasAny => Year != null || TimeOfDay != null;
+
+    public enum TimesOfDay
+    {
+        Morning,
+        Afternoon,
+        Evening,
+        Night
+    }
 }

@@ -19,16 +19,16 @@ public class IntegrityChecker
     /// <returns>list of years for which integrity check failed</returns>
     public async Task<List<int>> InvalidYears()
     {
-        var info = await album.GetInfo();
+        var info = await album.GetInfo(new FilterModel());
         var index = await album.GetYearIndex();
 
         List<int> invalidYears = new List<int>();
-        foreach (var year in info.Years)
+        foreach (var yearMap in info.Years)
         {
-            var i = index.FirstOrDefault(y => y.Year == year);
-            if (i == null)
+            var i = index.FirstOrDefault(y => y.Year == yearMap.Year);
+            if (i == null || i.Count != yearMap.Count)
             {
-                invalidYears.Add(year);
+                invalidYears.Add(yearMap.Year);
             }
             else
             {
@@ -48,17 +48,18 @@ public class IntegrityChecker
     /// <returns></returns>
     public async Task CheckYear(int year)
     {
-        var images = await album.GetImages(new FilterModel()
-        {
-            Year = new Interval(year)
-        });
+        var filter = new FilterModel() { Year = new Interval(year) };
+        var info = await album.GetInfo(filter);
+        var index = info.Years.FirstOrDefault(y => y.Year == year);
 
-        if (images.Count == 0)
+        if (index == null || index.Count == 0)
         {
             // There are no images from this year, remove the index
             await album.RemoveYearIndex(year);
             return;
         }
+
+        var images = await album.GetImages(filter, new Interval(0, index.Count));
 
         var crcs = images
             .OrderBy(i => i.Info.Id)
