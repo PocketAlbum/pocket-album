@@ -1,3 +1,4 @@
+using PocketAlbum.Models;
 using PocketAlbum.SQLite;
 using SixLabors.ImageSharp;
 
@@ -24,7 +25,17 @@ internal class Program
     {
         try
         {
-            IAlbum album = await SQLiteAlbum.Open(albumPath);
+            IAlbum album;
+            if (File.Exists(albumPath))
+            {
+                album = await SQLiteAlbum.Open(albumPath);
+            }
+            else
+            {
+                var name = GetName();
+                album = await SQLiteAlbum.Create(albumPath, MetadataModel.Create(name));
+            }
+            
 
             IntegrityChecker checker = new IntegrityChecker(album);
             await CheckIndex(checker);
@@ -39,8 +50,21 @@ internal class Program
         catch (Exception e)
         {
             Console.WriteLine(e.Message);
+            Console.WriteLine(e.InnerException);
             Console.WriteLine(e.StackTrace);
         }
+    }
+
+    static string GetName()
+    {
+        string? name;
+        do
+        {
+            Console.WriteLine("Creating new album, enter name:");
+            name = Console.ReadLine();
+        }
+        while (string.IsNullOrWhiteSpace(name));
+        return name;
     }
 
     static async Task CheckIndex(IntegrityChecker checker)

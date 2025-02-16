@@ -16,12 +16,56 @@ public class SQLiteAlbum : IAlbum
         Connection = connection;
     }
 
-    public static async Task<SQLiteAlbum> Open(string path)
+    public static async Task<SQLiteAlbum> Create(string path, MetadataModel metadata)
     {
+        if (!path.EndsWith(".sqlite"))
+        {
+            throw new ArgumentException($"Filename {path} must have sqlite extension");
+        }
+        if (File.Exists(path))
+        {
+            throw new InvalidDataException($"File with at path {path} already exists");
+        }
+        try
+        {
+            metadata.Validate();
+        }
+        catch (Exception ex)
+        {
+            throw new ArgumentException("Invalid metadata provided", ex);
+        }
+
         var db = new SQLiteAsyncConnection(path, false);
         await db.CreateTableAsync<SQLiteImage>();
         await db.CreateTableAsync<SQLiteYearIndex>();
+        await db.CreateTableAsync<SQLiteMetadata>();
+
+        await MetadataHelper.Write(db, metadata);
+
         return new SQLiteAlbum(db);
+    }
+
+    public static async Task<SQLiteAlbum> Open(string path)
+    {
+        try
+        {
+            var db = new SQLiteAsyncConnection(path, false);
+
+            var metadata = await MetadataHelper.Read(db);
+            metadata.Validate();
+
+            return new SQLiteAlbum(db);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException(
+                $"Unable to open {path} as an existing Pocket Album file", ex);
+        }
+    }
+
+    public async Task<MetadataModel> GetMetadata()
+    {
+        return await MetadataHelper.Read(Connection);
     }
 
     private string GetWhere(FilterModel filter) {
@@ -149,6 +193,7 @@ public class SQLiteAlbum : IAlbum
             Data = data,
             Crc = image.Crc
         });
+        await MetadataHelper.UpdatedNow(Connection);
     }
 
     public async Task<bool> ImageExists(string id)

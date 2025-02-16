@@ -4,6 +4,8 @@ namespace PocketAlbum;
 
 public interface IAlbum
 {
+    Task<MetadataModel> GetMetadata();
+
     Task<AlbumInfo> GetInfo(FilterModel filter);
 
     Task<byte[]> GetData(string id);
