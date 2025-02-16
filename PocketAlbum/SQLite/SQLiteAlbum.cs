@@ -5,8 +5,8 @@ namespace PocketAlbum.SQLite;
 
 public class SQLiteAlbum : IAlbum
 {
-    private const string yearQuery = "CAST(substr(Created, 1, 4) AS SIGNED) AS y";
-    private const string hourQuery = "CAST(substr(Created, 12, 2) AS SIGNED) AS h";
+    private const string yearQuery = "CAST(substr(created, 1, 4) AS SIGNED) AS y";
+    private const string hourQuery = "CAST(substr(created, 12, 2) AS SIGNED) AS h";
     private const string filterQueries = yearQuery + ", " + hourQuery;
 
     public SQLiteAsyncConnection Connection { get; }
@@ -66,20 +66,20 @@ public class SQLiteAlbum : IAlbum
         string where = "WHERE " + GetWhere(filter);
         
         var years = await Connection.QueryAsync<YearsQuery>(
-            $"SELECT COUNT(*), {filterQueries} FROM Image {where} GROUP BY y");
+            $"SELECT COUNT(*), {filterQueries} FROM image {where} GROUP BY y");
 
         return new AlbumInfo()
         {
             ImageCount = years.Sum(y => y.Count),
             DateCount = (int)await QueryNumber(
-                $"SELECT COUNT(DISTINCT DATE(Created)), {filterQueries} " +
-                $"FROM Image {where}"),
+                $"SELECT COUNT(DISTINCT DATE(created)), {filterQueries} " +
+                $"FROM image {where}"),
             ThumbnailsSize = await QueryNumber(
-                $"SELECT SUM(LENGTH(Thumbnail)), {filterQueries} " +
-                $"FROM Image {where}"),
+                $"SELECT SUM(LENGTH(thumbnail)), {filterQueries} " +
+                $"FROM image {where}"),
             ImagesSize = await QueryNumber(
-                $"SELECT SUM(LENGTH(Data)), {filterQueries} " +
-                $"FROM Image {where}"),
+                $"SELECT SUM(LENGTH(data)), {filterQueries} " +
+                $"FROM image {where}"),
             Years = years
                 .Select(y => new YearIndex(){
                     Year = y.Year, Count = y.Count, Crc = 0, Size = 0
@@ -92,11 +92,11 @@ public class SQLiteAlbum : IAlbum
     {
         long count = paging.To - paging.From + 1;
 
-        string query = "SELECT \"Id\", \"Filename\", \"ContentType\", \"Created\", " +
-            "\"Width\", \"Height\", \"Size\", \"Latitude\", \"Longitude\", " +
-            "\"Crc\", \"Thumbnail\", " + filterQueries + " FROM Image " +
+        string query = "SELECT \"id\", \"filename\", \"contentType\", \"created\", " +
+            "\"width\", \"height\", \"size\", \"latitude\", \"longitude\", " +
+            "\"crc\", \"thumbnail\", " + filterQueries + " FROM image " +
             $"WHERE {GetWhere(filter)} " +
-            "ORDER BY Created ASC " +
+            "ORDER BY created ASC " +
             $"LIMIT {paging.From}, {count}";
 
         var images = await Connection.QueryAsync<SQLiteImage>(query);
@@ -155,8 +155,8 @@ public class SQLiteAlbum : IAlbum
     {
         var result = await Connection.QueryScalarsAsync<int>(
             "SELECT EXISTS(SELECT 1 " +
-            "FROM Image " +
-            $"WHERE Id=\"{id}\")");
+            "FROM image " +
+            $"WHERE id=\"{id}\")");
         return result.Count == 1 && result[0] == 1;
     }
 

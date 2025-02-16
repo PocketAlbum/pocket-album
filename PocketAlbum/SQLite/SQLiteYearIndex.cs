@@ -2,18 +2,18 @@ using SQLite;
 
 namespace PocketAlbum.SQLite;
 
-[Table("YearIndex")]
+[Table("index")]
 internal class SQLiteYearIndex
 {
-    [PrimaryKey, NotNull]
+    [Column("year"), PrimaryKey, NotNull]
     public int? Year { get; set; }
 
-    [NotNull]
+    [Column("count"), NotNull]
     public int? Count { get; set; }
 
-    [NotNull]
+    [Column("crc"), NotNull]
     public uint? Crc { get; set; }
 
-    [NotNull]
+    [Column("size"), NotNull]
     public ulong? Size { get; set; } 
 }

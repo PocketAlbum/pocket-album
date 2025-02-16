@@ -2,40 +2,42 @@ using SQLite;
 
 namespace PocketAlbum.SQLite;
 
-[Table("Image")]
+[Table("image")]
 public class SQLiteImage
 {
-    [PrimaryKey, NotNull]
+    [Column("id"), PrimaryKey, NotNull]
     public string? Id { get; set; }
 
-    [NotNull]
+    [Column("fileName"), NotNull]
     public string? Filename { get; set; }
 
-    [NotNull]
+    [Column("created"), NotNull]
     public DateTime Created { get; set; }
 
-    [NotNull]
+    [Column("contentType"), NotNull]
     public string? ContentType { get; set; }
 
-    [NotNull]
+    [Column("width"), NotNull]
     public int? Width { get; set; }
 
-    [NotNull]
+    [Column("height"), NotNull]
     public int? Height { get; set; }
 
-    [NotNull]
+    [Column("size"), NotNull]
     public ulong? Size { get; set; }
 
+    [Column("latitude")]
     public double? Latitude { get; set; }
 
+    [Column("longitude")]
     public double? Longitude { get; set; }
 
-    [NotNull]
+    [Column("thumbnail"), NotNull]
     public byte[]? Thumbnail { get; set; }
 
-    [NotNull]
+    [Column("data"), NotNull]
     public byte[]? Data { get; set; }
 
-    [NotNull]
+    [Column("crc"), NotNull]
     public uint? Crc { get; set;  }
 }
