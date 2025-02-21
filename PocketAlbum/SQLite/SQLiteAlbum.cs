@@ -5,6 +5,7 @@ namespace PocketAlbum.SQLite;
 
 public class SQLiteAlbum : IAlbum
 {
+    private const int APPLICATION_ID = 0x6C416F50;
     private const string yearQuery = "CAST(substr(created, 1, 4) AS SIGNED) AS y";
     private const string hourQuery = "CAST(substr(created, 12, 2) AS SIGNED) AS h";
     private const string filterQueries = yearQuery + ", " + hourQuery;
@@ -39,6 +40,7 @@ public class SQLiteAlbum : IAlbum
         await db.CreateTableAsync<SQLiteImage>();
         await db.CreateTableAsync<SQLiteYearIndex>();
         await db.CreateTableAsync<SQLiteMetadata>();
+        await db.ExecuteAsync($"PRAGMA application_id = {APPLICATION_ID};");
 
         await MetadataHelper.Write(db, metadata);
 
@@ -50,6 +52,13 @@ public class SQLiteAlbum : IAlbum
         try
         {
             var db = new SQLiteAsyncConnection(path, false);
+
+            var result = await db.QueryScalarsAsync<int>("PRAGMA application_id;");
+            int applicationId = result.First();
+            if (applicationId != APPLICATION_ID)
+            {
+                throw new FormatException($"Unknown application id {applicationId}");
+            }
 
             var metadata = await MetadataHelper.Read(db);
             metadata.Validate();
