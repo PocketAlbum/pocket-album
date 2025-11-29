@@ -6,6 +6,7 @@ using System.Linq;
 using Avalonia.Markup.Xaml;
 using PocketAlbum.Studio.ViewModels;
 using PocketAlbum.Studio.Views;
+using PocketAlbum.Models;
 
 namespace PocketAlbum.Studio;
 
@@ -20,12 +21,14 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            //IAlbum album = await SQLiteAlbum.Open("albumPath");
+
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
             // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(),
+                DataContext = new GalleryViewModel(),
             };
         }
 

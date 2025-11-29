@@ -8,6 +8,7 @@ internal class Program
 {
     static void Main(string[] args)
     {
+        args = ["/home/jaka/Downloads/album.sqlite"];
         Console.WriteLine("Pocket Album Tool");
         if (args.Length == 0 || !args[0].EndsWith(".sqlite"))
         {
