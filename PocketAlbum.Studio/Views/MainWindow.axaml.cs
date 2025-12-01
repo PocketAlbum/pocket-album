@@ -10,6 +10,8 @@ namespace PocketAlbum.Studio.Views;
 
 public partial class MainWindow : Window
 {
+    IAlbum album;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -28,14 +30,11 @@ public partial class MainWindow : Window
         {
             await OpenAlbum(path.Substring(7));
         }
-
     }
 
     private async Task OpenAlbum(string path)
     {
-        IAlbum album = await SQLiteAlbum.Open(path);
-        var meta = await album.GetMetadata();
-        message.Text = "Opened album " + meta.Name;
+        album = await SQLiteAlbum.Open(path);
 
         if (DataContext is GalleryViewModel gvm)
         {
@@ -49,6 +48,26 @@ public partial class MainWindow : Window
         if (args.Element is Image img && img.DataContext is GalleryItem item)
         {
             _ = item.EnsureLoadedAsync();
+        }
+    }
+
+    public async void ExitClick(object? sender, RoutedEventArgs args)
+    {
+        Close();
+        System.Environment.Exit(0);
+    }
+
+    public async void ImportImagesClick(object? sender, RoutedEventArgs args)
+    {
+        /*if (album != null)*/ 
+        {
+            /*ImportWindow importWindow = new ImportWindow(album)
+            {
+                DataContext = new ImportWindowViewModel()
+            };
+            importWindow.Show();*/
+            ImageProgressWindow progressWindow = new ImageProgressWindow();
+            progressWindow.Show();
         }
     }
 }

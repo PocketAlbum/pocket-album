@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="PocketAlbum.Studio.Views.ImageStatusControl">
+
+    <StackPanel Orientation="Horizontal">
+        <Image Width="24" Height="24" 
+            Source="/Assets/MDI/help_black_24.png" />
+        <TextBlock Text="Already exists"
+            Margin="10,5"
+            Width="100"
+            VerticalAlignment="Center" />
+        <TextBlock Text="PANO_20180930_140029.jpg" 
+            Margin="10,5"
+            Width="300"
+            VerticalAlignment="Center" />
+
+        <TextBlock Text="4,5 MB" 
+            Margin="10,5"
+            VerticalAlignment="Center" />
+    </StackPanel>
+</UserControl>

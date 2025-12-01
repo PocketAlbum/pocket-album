@@ -1,0 +1,51 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PocketAlbum.Studio.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="450"
+        xmlns:controls="clr-namespace:PocketAlbum.Studio.Views"
+        x:Class="PocketAlbum.Studio.Views.ImageProgressWindow"
+        x:DataType="vm:ImageProgressViewModel"
+        Icon="/Assets/pocket_album_1024.png"
+        Title="Import images">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:ImageProgressViewModel/>
+    </Design.DataContext>
+
+    <DockPanel LastChildFill="True">
+        <TextBlock DockPanel.Dock="Top" Margin="10">
+            Current location: 
+        </TextBlock>
+        <StackPanel 
+            DockPanel.Dock="Top"
+            Orientation="Horizontal">
+            <TextBlock Margin="10">123 files</TextBlock>
+            <TextBlock Margin="10">13 folders</TextBlock>
+            <TextBlock Margin="10">00:00:00</TextBlock>
+        </StackPanel>
+        <StackPanel 
+            DockPanel.Dock="Top"
+            Orientation="Horizontal">
+            <TextBlock Margin="10">123 imported</TextBlock>
+            <TextBlock Margin="10">13 existing</TextBlock>
+        </StackPanel>
+
+        <StackPanel 
+            DockPanel.Dock="Bottom" 
+            HorizontalAlignment="Right"
+            Margin="10">
+            <Button>Cancel</Button>
+        </StackPanel>
+
+        <StackPanel Margin="10">
+            <controls:ImageStatusControl />
+            <controls:ImageStatusControl />
+            <controls:ImageStatusControl />
+        </StackPanel>
+    </DockPanel>
+
+</Window>
