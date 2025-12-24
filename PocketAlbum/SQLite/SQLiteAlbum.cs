@@ -41,6 +41,7 @@ public class SQLiteAlbum : IAlbum
         await db.CreateTableAsync<SQLiteYearIndex>();
         await db.CreateTableAsync<SQLiteMetadata>();
         await db.ExecuteAsync($"PRAGMA application_id = {APPLICATION_ID};");
+        await db.ExecuteAsync("CREATE INDEX idx_image_created ON image(created);");
 
         await MetadataHelper.Write(db, metadata);
 
