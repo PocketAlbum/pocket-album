@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using PocketAlbum.Studio.ViewModels;
@@ -55,8 +57,14 @@ public class RecursiveFilesImporter
     {
         progressModel.Folders++;
         progressModel.Location = path;
+        List<string> extensions = [];
+        extensions.AddRange([".jpg", ".jpeg", ".jfif", ".pjpeg", ".pjp"]);
+        extensions.AddRange([".heif", ".heic", ".heifs", ".heics"]);
+        extensions.AddRange([".tif", ".tiff"]);
+        extensions.AddRange([".png"]);
+
         var files = Directory.EnumerateFiles(path);
-        foreach (var file in files)
+        foreach (var file in files.Where(f => extensions.Any(e => f.EndsWith(e))))
         {
             progressWindow.Cancellation.ThrowIfCancellationRequested();
 
