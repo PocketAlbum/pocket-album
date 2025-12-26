@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Avalonia.Controls;
 using PocketAlbum.Studio.ViewModels;
 using PocketAlbum.Studio.Views;
 using static PocketAlbum.ImageImporter;
@@ -30,10 +31,9 @@ public class RecursiveFilesImporter
         };
     }
 
-    internal void Start()
+    internal async Task Start(Window owner)
     {
-        progressWindow.Show();
-        Task.Run(async () =>
+        var task = Task.Run(async () =>
         {
             try {
                 ImageImporter importer = new ImageImporter(album);
@@ -48,6 +48,7 @@ public class RecursiveFilesImporter
                 progressModel.MarkDone();
             }
         });
+        await progressWindow.ShowDialog(owner);
     }
 
     async Task AddRecursively(ImageImporter importer, string path)

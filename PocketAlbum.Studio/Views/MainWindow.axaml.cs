@@ -13,8 +13,6 @@ namespace PocketAlbum.Studio.Views;
 
 public partial class MainWindow : Window
 {
-    IAlbum? album;
-
     public MainWindow()
     {
         InitializeComponent();
@@ -40,16 +38,11 @@ public partial class MainWindow : Window
         {
             return;
         }
-        await CreateAlbum(files.Path.ToString()[8..], metadata);
-    }
-
-    private async Task CreateAlbum(string path, MetadataModel metadata)
-    {
-        album = await SQLiteAlbum.Create(path, metadata);
-
-        if (DataContext is GalleryViewModel gvm)
+        if (DataContext is GalleryViewModel)
         {
-            await gvm.OpenAlbum(album);
+            var path = files.Path.ToString()[8..];
+            await SQLiteAlbum.Create(path, metadata);
+            await OpenAlbum(path);
         }
     }
 
@@ -64,17 +57,16 @@ public partial class MainWindow : Window
         if (files.SingleOrDefault()?.Path?.ToString() is string path && 
             path.StartsWith("file://"))
         {
-            await OpenAlbum(path.Substring(7));
+            await OpenAlbum(path[8..]);
         }
     }
 
     private async Task OpenAlbum(string path)
     {
-        album = await SQLiteAlbum.Open(path);
-
         if (DataContext is GalleryViewModel gvm)
         {
-            await gvm.OpenAlbum(album);
+            var album = await SQLiteAlbum.Open(path);
+            await gvm.OpenAlbum(album, path);
         }
     }
 
@@ -95,7 +87,7 @@ public partial class MainWindow : Window
 
     public async void ImportImagesClick(object? sender, RoutedEventArgs args)
     {
-        if (album != null)
+        if (DataContext is GalleryViewModel gvm && gvm.Album is IAlbum album)
         {
             var folder = await StorageProvider.OpenFolderPickerAsync(
                 new FolderPickerOpenOptions { Title = "Select images to import" });
@@ -105,13 +97,14 @@ public partial class MainWindow : Window
             }
             var path = folder.Single().Path.ToString().Substring(8);
             RecursiveFilesImporter importer = new RecursiveFilesImporter(path, album);
-            importer.Start();
+            await importer.Start(this);
+            await gvm.OpenAlbum(album, gvm.AlbumPath);
         }
     }
 
     public async void EditMetadataClick(object? sender, RoutedEventArgs args)
     {
-        if (album != null)
+        if (DataContext is GalleryViewModel gvm && gvm.Album is IAlbum album)
         {
             var metadata = await album.GetMetadata();
             MetadataWindow window = new MetadataWindow()
@@ -136,6 +129,14 @@ public partial class MainWindow : Window
                 Created = metadata.Created,
                 Updated = DateTime.Now
             });
+        }
+    }
+
+    public async void CloseAlbumClick(object? sender, RoutedEventArgs args)
+    {
+        if (DataContext is GalleryViewModel gvm)
+        {
+            gvm.CloseAlbum();
         }
     }
 }

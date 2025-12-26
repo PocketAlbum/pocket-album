@@ -8,7 +8,7 @@
         xmlns:controls="clr-namespace:PocketAlbum.Studio.Views"
         x:Class="PocketAlbum.Studio.Views.MetadataWindow"
         x:DataType="vm:MetadataViewModel"
-        Icon="/Assets/pocket_album_64.png"
+        Icon="/Assets/pocket_album_32.png"
         Title="Album details">
 
     <Design.DataContext>

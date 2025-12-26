@@ -6,12 +6,10 @@
         mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="450"
         x:Class="PocketAlbum.Studio.Views.MainWindow"
         x:DataType="vm:GalleryViewModel"
-        Icon="/Assets/pocket_album_64.png"
-        Title="PocketAlbum Studio">
+        Icon="/Assets/pocket_album_32.png"
+        Title="{Binding WindowTitle}">
 
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:GalleryViewModel/>
     </Design.DataContext>
 
@@ -20,6 +18,7 @@
             <MenuItem Header="_Album">
                 <MenuItem Header="_New" Click="NewAlbumClick"/>
                 <MenuItem Header="_Open from file" Click="OpenAlbumClick"/>
+                <MenuItem Header="Close" Click="CloseAlbumClick"/>
                 <Separator/>
                 <MenuItem Header="_Exit" Click="ExitClick"/>
             </MenuItem>
@@ -28,26 +27,32 @@
                 <MenuItem Header="Import from folder" Click="ImportImagesClick"/>
             </MenuItem>
         </Menu>
-        <ScrollViewer>
-            <ItemsRepeater ItemsSource="{Binding Images}" ElementPrepared="OnElementPrepared">
-                <ItemsRepeater.Layout>
-                    <UniformGridLayout 
-                        MinColumnSpacing="10" 
-                        MinRowSpacing="10" 
-                        Orientation="Horizontal" />
-                </ItemsRepeater.Layout>
+        <Panel>
+            <StackPanel IsVisible="{Binding !HasImages}"
+                VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Image Width="64" Height="64"
+                    Source="avares://PocketAlbum.Studio/Assets/pocket_album_64.png" />
+                <TextBlock Text="{Binding StatusString}" FontSize="16" />
+            </StackPanel>
+            <ScrollViewer IsVisible="{Binding HasImages}">
+                <ItemsRepeater ItemsSource="{Binding Images}" ElementPrepared="OnElementPrepared">
+                    <ItemsRepeater.Layout>
+                        <UniformGridLayout 
+                            MinColumnSpacing="10" 
+                            MinRowSpacing="10" 
+                            Orientation="Horizontal" />
+                    </ItemsRepeater.Layout>
 
-                <ItemsRepeater.ItemTemplate>
-                    <DataTemplate>
-                        <Image Width="64"
-                            Height="64"
-                            Stretch="UniformToFill"
-                            Source="{Binding Preview}" />
-                    </DataTemplate>
-                </ItemsRepeater.ItemTemplate>
-
-            </ItemsRepeater>
-        </ScrollViewer>
+                    <ItemsRepeater.ItemTemplate>
+                        <DataTemplate>
+                            <Image Width="64" Height="64"
+                                Stretch="UniformToFill"
+                                Source="{Binding Preview}" />
+                        </DataTemplate>
+                    </ItemsRepeater.ItemTemplate>
+                </ItemsRepeater>
+            </ScrollViewer>
+        </Panel>
     </DockPanel>
 
 </Window>

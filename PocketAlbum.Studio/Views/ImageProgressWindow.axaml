@@ -8,7 +8,7 @@
         xmlns:controls="clr-namespace:PocketAlbum.Studio.Views"
         x:Class="PocketAlbum.Studio.Views.ImageProgressWindow"
         x:DataType="vm:ImageProgressViewModel"
-        Icon="/Assets/pocket_album_64.png"
+        Icon="/Assets/pocket_album_32.png"
         Title="Import images">
 
     <Design.DataContext>
