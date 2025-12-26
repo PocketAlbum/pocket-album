@@ -1,0 +1,34 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PocketAlbum.Studio.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="170"
+        Height="170" Width="400" CanResize="False"
+        xmlns:controls="clr-namespace:PocketAlbum.Studio.Views"
+        x:Class="PocketAlbum.Studio.Views.MetadataWindow"
+        x:DataType="vm:MetadataViewModel"
+        Icon="/Assets/pocket_album_64.png"
+        Title="Album details">
+
+    <Design.DataContext>
+        <vm:MetadataViewModel/>
+    </Design.DataContext>
+
+    <Grid ColumnDefinitions="100,*" RowDefinitions="Auto,Auto,Auto"  Margin="10">
+        <TextBlock Grid.Row="0" Grid.Column="0" Margin="10" 
+            VerticalAlignment="Center" HorizontalAlignment="Right"
+            Text="Title"/>
+        <TextBox Grid.Row="0" Grid.Column="1"  Margin="10" 
+            Text="{Binding Title}" />
+        <TextBlock Grid.Row="1" Grid.Column="0" 
+            VerticalAlignment="Center" HorizontalAlignment="Right"
+            Text="Description" />
+        <TextBox Grid.Row="1" Grid.Column="1"  Margin="10" 
+            Text="{Binding Description}" />
+        <Button Grid.Row="2" Grid.Column="1" 
+            HorizontalAlignment="Right" Margin="10" Click="SaveClick">
+            Save
+        </Button>
+    </Grid>
+</Window>

@@ -18,7 +18,8 @@
     <DockPanel LastChildFill="True">
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_Album">
-                <MenuItem Header="_Open..." Click="OpenAlbumClick"/>
+                <MenuItem Header="_New" Click="NewAlbumClick"/>
+                <MenuItem Header="_Open from file" Click="OpenAlbumClick"/>
                 <Separator/>
                 <MenuItem Header="_Exit" Click="ExitClick"/>
             </MenuItem>

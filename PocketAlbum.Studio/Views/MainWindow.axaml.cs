@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using PocketAlbum.Models;
 using PocketAlbum.SQLite;
 using PocketAlbum.Studio.Core;
 using PocketAlbum.Studio.ViewModels;
@@ -12,11 +13,44 @@ namespace PocketAlbum.Studio.Views;
 
 public partial class MainWindow : Window
 {
-    IAlbum album;
+    IAlbum? album;
 
     public MainWindow()
     {
         InitializeComponent();
+    }
+
+    public async void NewAlbumClick(object sender, RoutedEventArgs args)
+    {
+        MetadataWindow window = new MetadataWindow()
+        {
+            DataContext = new MetadataViewModel()
+        };
+        var metadata = await window.ShowDialog<MetadataModel?>(this);
+        if (metadata == null)
+        {
+            return;
+        }
+        var files = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "Save album to file",
+            SuggestedFileName = $"{metadata.Name}.sqlite"
+        });
+        if (files == null)
+        {
+            return;
+        }
+        await CreateAlbum(files.Path.ToString()[8..], metadata);
+    }
+
+    private async Task CreateAlbum(string path, MetadataModel metadata)
+    {
+        album = await SQLiteAlbum.Create(path, metadata);
+
+        if (DataContext is GalleryViewModel gvm)
+        {
+            await gvm.OpenAlbum(album);
+        }
     }
 
     public async void OpenAlbumClick(object sender, RoutedEventArgs args)
@@ -56,7 +90,7 @@ public partial class MainWindow : Window
     public async void ExitClick(object? sender, RoutedEventArgs args)
     {
         Close();
-        System.Environment.Exit(0);
+        Environment.Exit(0);
     }
 
     public async void ImportImagesClick(object? sender, RoutedEventArgs args)
