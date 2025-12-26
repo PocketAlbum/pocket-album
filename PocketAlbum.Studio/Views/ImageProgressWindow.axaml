@@ -94,7 +94,7 @@
                                 Margin="10,5"
                                 Width="300"
                                 VerticalAlignment="Center" />
-                            <TextBlock Text="{Binding SizeString}" 
+                            <TextBlock Text="{Binding Size, Converter={x:Static controls:Converters.FormatSize}}" 
                                 Margin="10,5"
                                 VerticalAlignment="Center" />
                         </StackPanel>

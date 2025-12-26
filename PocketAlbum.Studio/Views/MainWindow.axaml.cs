@@ -162,4 +162,20 @@ public partial class MainWindow : Window
             gvm.CloseAlbum();
         }
     }
+
+    public async void ShowStatisticsClick(object? sender, RoutedEventArgs args)
+    {
+        if (DataContext is GalleryViewModel gvm && gvm.Album is IAlbum album) {
+            AlbumStatisticsWindow window = new AlbumStatisticsWindow()
+            {
+                DataContext = new AlbumStatisticsViewModel()
+                {
+                    Album = album,
+                    Metadata = await album.GetMetadata(),
+                    YearIndex = await album.GetYearIndex()
+                }
+            };
+            await window.ShowDialog(this);
+        }
+    }
 }

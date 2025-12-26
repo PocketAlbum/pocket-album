@@ -69,7 +69,7 @@ public class RecursiveFilesImporter
             progressWindow.Cancellation.ThrowIfCancellationRequested();
 
             long size = new FileInfo(file).Length;
-            var item = new ImportItem(Path.GetFileName(file), size);
+            var item = new ImportItem(Path.GetFileName(file), (ulong)size);
             progressModel.Total++;
             progressModel.AddItem(item);
             try

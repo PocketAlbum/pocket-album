@@ -17,8 +17,10 @@
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_Album">
                 <MenuItem Header="_New" Click="NewAlbumClick"/>
-                <MenuItem Header="_Open from file" Click="OpenAlbumClick"/>
+                <MenuItem Header="_Open file" Click="OpenAlbumClick"/>
                 <MenuItem Header="Close" Click="CloseAlbumClick"/>
+                <Separator/>
+                <MenuItem Header="Statistics" Click="ShowStatisticsClick"/>
                 <Separator/>
                 <MenuItem Header="_Exit" Click="ExitClick"/>
             </MenuItem>

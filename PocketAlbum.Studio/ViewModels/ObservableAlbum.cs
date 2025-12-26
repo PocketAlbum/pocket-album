@@ -4,7 +4,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using PocketAlbum.Models;
-using PocketAlbum.Studio.Views;
 
 namespace PocketAlbum.Studio.ViewModels;
 

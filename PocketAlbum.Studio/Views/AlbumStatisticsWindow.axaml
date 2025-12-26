@@ -1,0 +1,60 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PocketAlbum.Studio.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="360" d:DesignHeight="400"
+        Width="360" Height="400"
+        xmlns:controls="clr-namespace:PocketAlbum.Studio.Views"
+        x:Class="PocketAlbum.Studio.Views.AlbumStatisticsWindow"
+        x:DataType="vm:AlbumStatisticsViewModel"
+        Icon="/Assets/pocket_album_32.png"
+        Title="Album statistics">
+
+    <Design.DataContext>
+        <vm:AlbumStatisticsViewModel/>
+    </Design.DataContext>
+
+    <DockPanel LastChildFill="True">
+        <Grid ColumnDefinitions="100,*" RowDefinitions="Auto,Auto,Auto"  Margin="10"
+            DockPanel.Dock="Top">
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Margin="10" 
+                VerticalAlignment="Center" HorizontalAlignment="Right"
+                Text="Name" FontStyle="Italic" />
+            <TextBlock Grid.Row="0" Grid.Column="1"  Margin="10" 
+                Text="{Binding Metadata.Name}" />
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="10" 
+                VerticalAlignment="Center" HorizontalAlignment="Right"
+                Text="Years" FontStyle="Italic" />
+            <TextBlock Grid.Row="1" Grid.Column="1"  Margin="10"
+                Text="{Binding YearsSummary}" />
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Margin="10" 
+                VerticalAlignment="Center" HorizontalAlignment="Right"
+                Text="Total size" FontStyle="Italic" />
+            <TextBlock Grid.Row="2" Grid.Column="1"  Margin="10"
+                Text="{Binding TotalSize}" />
+
+        </Grid>
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="32,0">
+            <TextBlock Text="Year" Width="50" Margin="10" />
+            <TextBlock Text="Images" Width="80" Margin="10" TextAlignment="Right" />
+            <TextBlock Text="Size" Width="80" Margin="10" TextAlignment="Right" />
+        </StackPanel>
+        <ListBox ItemsSource="{Binding YearIndex}" Margin="20,0,20,20" >
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Year}" Width="50" Margin="10,0" />
+                        <TextBlock Text="{Binding Count}" Width="80" Margin="10,0" TextAlignment="Right" />
+                        <TextBlock Width="80" Margin="10,0" TextAlignment="Right"
+                            Text="{Binding Size, Converter={x:Static controls:Converters.FormatSize}}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
+</Window>

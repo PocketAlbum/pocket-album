@@ -95,7 +95,7 @@ internal class Program
         foreach (var file in files)
         {
             long size = new FileInfo(file).Length;
-            Console.Write($"{Path.GetFileName(file)} ({FormatSize(size)})");
+            Console.Write($"{Path.GetFileName(file)} ({Utilities.FormatSize(size)})");
             try
             {
                 await importer.Import(file);
@@ -116,18 +116,5 @@ internal class Program
         {
             await AddRecursively(importer, dir);
         }
-    }
-
-    static string FormatSize(long size)
-    {
-        if (size > 1000000)
-        {
-            return string.Format("{0:F1} MB", (decimal)size / 1000000);
-        }
-        else if (size > 1000)
-        {
-            return string.Format("{0:F1} kB", (decimal)size / 1000);
-        }
-        else return size + " B";
     }
 }

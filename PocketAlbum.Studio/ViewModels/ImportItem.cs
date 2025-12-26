@@ -7,33 +7,17 @@ using SixLabors.ImageSharp;
 
 namespace PocketAlbum.Studio.ViewModels;
 
-public class ImportItem(string path, long size) : ObservableObject
+public class ImportItem(string path, ulong size) : ObservableObject
 {
     private readonly string path = path;
 
     public string Filename => Path.GetFileName(path);
 
-    public long Size { get; } = size;
+    public ulong Size { get; } = size;
 
     public Exception? Exception { get; private set; }
 
     public ImportStates State { get; private set; } = ImportStates.PROCESSING;
-
-    public string SizeString 
-    {
-        get
-        {
-            if (Size > 1000000)
-            {
-                return string.Format("{0:F1} MB", (decimal)Size / 1000000);
-            }
-            else if (Size > 1000)
-            {
-                return string.Format("{0:F1} kB", (decimal)Size / 1000);
-            }
-            else return Size + " B";
-        }
-    }
 
     public string Status
     {
