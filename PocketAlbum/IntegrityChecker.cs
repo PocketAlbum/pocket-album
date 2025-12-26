@@ -2,13 +2,23 @@ using PocketAlbum.Models;
 
 namespace PocketAlbum;
 
-public class IntegrityChecker
+public class IntegrityChecker(IAlbum album)
 {
-    private IAlbum album;
+    private readonly IAlbum album = album;
 
-    public IntegrityChecker(IAlbum album)
+    public async Task CheckAllYears(Action<double>? progress = null)
     {
-        this.album = album;
+        var invalidYears = await InvalidYears(p => progress?.Invoke(p * 0.1));
+        await CheckYears(invalidYears, p => progress?.Invoke(0.1 + (p * 0.9)));
+    }
+
+    private async Task CheckYears(List<int> years, Action<double>? progress = null)
+    {
+        for (int i = 0; i < years.Count; i++)
+        {
+            progress?.Invoke((double)i / years.Count);
+            await CheckYear(years[i]);
+        }
     }
 
     /// <summary>
@@ -17,14 +27,18 @@ public class IntegrityChecker
     /// each year and fix the index.
     /// </summary>
     /// <returns>list of years for which integrity check failed</returns>
-    public async Task<List<int>> InvalidYears()
+    public async Task<List<int>> InvalidYears(Action<double>? progress = null)
     {
         var info = await album.GetInfo(new FilterModel());
         var index = await album.GetYearIndex();
 
         List<int> invalidYears = new List<int>();
+        int cnt = 0;
         foreach (var yearMap in info.Years)
         {
+            progress?.Invoke((double)cnt / info.Years.Count);
+            cnt++;
+
             var i = index.FirstOrDefault(y => y.Year == yearMap.Year);
             if (i == null || i.Count != yearMap.Count)
             {

@@ -32,7 +32,11 @@
                 VerticalAlignment="Center" HorizontalAlignment="Center">
                 <Image Width="64" Height="64"
                     Source="avares://PocketAlbum.Studio/Assets/pocket_album_64.png" />
-                <TextBlock Text="{Binding StatusString}" FontSize="16" />
+                <TextBlock 
+                    Text="{Binding StatusString}" FontSize="16" 
+                    HorizontalAlignment="Center" Margin="10" />
+                <ProgressBar Value="{Binding Progress}" Maximum="1" 
+                    IsVisible="{Binding HasProgress}" />
             </StackPanel>
             <ScrollViewer IsVisible="{Binding HasImages}">
                 <ItemsRepeater ItemsSource="{Binding Images}" ElementPrepared="OnElementPrepared">

@@ -15,12 +15,21 @@ public partial class GalleryViewModel : ObservableObject
 
     public string AlbumPath = "";
 
+    [ObservableProperty]
+    private double? progress;
+
+    public bool HasProgress => Progress.HasValue;
+
     public string WindowTitle => $"PocketAlbum Studio {PocketAlbum.VersionString}{(AlbumPath != "" ? "  -  " : "")}{AlbumPath}";
 
     public string StatusString
     {
         get 
         {
+            if (HasProgress)
+            {
+                return "Opening album";
+            }
             if (Album == null)
             {
                 return "No album opened";
@@ -35,9 +44,21 @@ public partial class GalleryViewModel : ObservableObject
 
     public async Task OpenAlbum(IAlbum album, string path)
     {
+        Progress = 0;
+        OnPropertyChanged(nameof(HasProgress));
+        OnPropertyChanged(nameof(StatusString));
+        await new IntegrityChecker(album).CheckAllYears(p =>
+        {
+            Progress = p * 0.9;
+        });
+
+        Progress = 0.9;
         Images = await ObservableAlbum.FromAlbum(album, new Models.FilterModel());
+
         Album = album;
         AlbumPath = path;
+        Progress = null;
+        OnPropertyChanged(nameof(HasProgress));
         OnPropertyChanged(nameof(HasImages));
         OnPropertyChanged(nameof(StatusString));
         OnPropertyChanged(nameof(WindowTitle));
