@@ -3,9 +3,8 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
-using PocketAlbum.Studio.ViewModels;
 
-namespace PocketAlbum.Studio.Views;
+namespace PocketAlbum.Studio.ViewModels;
 
 public class GalleryItem : INotifyPropertyChanged
 {

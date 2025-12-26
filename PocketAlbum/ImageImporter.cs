@@ -48,7 +48,7 @@ public class ImageImporter
             
             if (await album.ImageExists(hash))
             {
-                throw new ImportException("Image already exists");
+                throw new ImageExistsException();
             }
             
             var format = await DetectFormat(stream);
@@ -153,6 +153,13 @@ public class ImageImporter
     public class ImportException : Exception
     {
         public ImportException(string? message) : base(message)
+        {
+        }
+    }
+
+    public class ImageExistsException : ImportException
+    {
+        public ImageExistsException() : base("Image exists")
         {
         }
     }

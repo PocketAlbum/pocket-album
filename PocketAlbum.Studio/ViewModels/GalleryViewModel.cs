@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using PocketAlbum.Studio.Views;
 
 namespace PocketAlbum.Studio.ViewModels;
 

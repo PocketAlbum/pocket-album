@@ -1,0 +1,114 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PocketAlbum.Studio.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="450"
+        Height="600" Width="700" CanResize="False"
+        xmlns:controls="clr-namespace:PocketAlbum.Studio.Views"
+        x:Class="PocketAlbum.Studio.Views.ImageProgressWindow"
+        x:DataType="vm:ImageProgressViewModel"
+        Icon="/Assets/pocket_album_64.png"
+        Title="Import images">
+
+    <Design.DataContext>
+        <vm:ImageProgressViewModel/>
+    </Design.DataContext>
+
+    <DockPanel LastChildFill="True">
+        <TextBlock 
+            DockPanel.Dock="Top"
+            Margin="10"
+            FontSize="24"
+            Text="{Binding ProcessName}" />
+        <TextBlock 
+            DockPanel.Dock="Top" 
+            Margin="10,10,10,0" 
+            Text="Current location:"
+            FontStyle="Italic" />
+        <TextBlock 
+            DockPanel.Dock="Top" 
+            Margin="10,5,10,10"  
+            Text="{Binding Location}" />
+        <StackPanel 
+            DockPanel.Dock="Top"
+            Orientation="Horizontal">
+            <TextBlock Margin="20,5">
+                <Run Text="{Binding Total}" />
+                <Run Text=" files" />
+            </TextBlock>
+            <TextBlock Margin="20,5">
+                <Run Text="{Binding Folders}" />
+                <Run Text=" folders" />
+            </TextBlock>
+            <TextBlock 
+                Margin="20,5" 
+                Text="{Binding TimeSinceStart.ElapsedString}" />
+        </StackPanel>
+        <ItemsControl 
+            ItemsSource="{Binding Statistics}" 
+            DockPanel.Dock="Top"
+            Margin="10">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="16" Height="16" 
+                               Source="{Binding Icon}" />
+                        <TextBlock Margin="5" FontWeight="Bold" 
+                                    Text="{Binding Count}"/>
+                        <TextBlock Margin="5" Text="{Binding StateString}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <StackPanel 
+            DockPanel.Dock="Bottom" 
+            HorizontalAlignment="Right"
+            Orientation="Horizontal">
+            <Button Margin="10" IsVisible="{Binding !Done}" Click="CancelClick">
+                Cancel
+            </Button>
+            <Button Margin="10" IsVisible="{Binding Done}" Click="CloseClick">
+                Close
+            </Button>
+        </StackPanel>
+
+        <Panel>
+            <ItemsControl ItemsSource="{Binding Items}" Margin="10">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="2">
+                            <Image Width="24" Height="24" 
+                                Source="{Binding Icon}" />
+                            <TextBlock Text="{Binding Status}"
+                                Margin="10,5"
+                                Width="200"
+                                VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding Filename}" 
+                                Margin="10,5"
+                                Width="300"
+                                VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding SizeString}" 
+                                Margin="10,5"
+                                VerticalAlignment="Center" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <Border Height="100" Margin="10" VerticalAlignment="Top">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%">
+                        <GradientStop Color="#FFFFFFFF" Offset="0.0"/>
+                        <GradientStop Color="#00FFFFFF" Offset="1.0"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+        </Panel>
+    </DockPanel>
+</Window>
