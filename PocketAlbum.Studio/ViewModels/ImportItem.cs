@@ -47,6 +47,10 @@ public class ImportItem(string path, long size) : ObservableObject
             {
                 return "Access denied";
             }
+            else if (Exception is IOException)
+            {
+                return "Failed to open";
+            }
             else if (Exception != null)
             {
                 return Exception.Message;

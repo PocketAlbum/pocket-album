@@ -58,7 +58,6 @@ public class RecursiveFilesImporter
         var files = Directory.EnumerateFiles(path);
         foreach (var file in files)
         {
-            await Task.Delay(1);
             progressWindow.Cancellation.ThrowIfCancellationRequested();
 
             long size = new FileInfo(file).Length;

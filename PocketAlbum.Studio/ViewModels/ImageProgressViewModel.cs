@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Avalonia.Media.Imaging;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using PocketAlbum.Studio.Core;
 using static PocketAlbum.Studio.ViewModels.ImportItem;
@@ -30,13 +31,19 @@ partial class ImageProgressViewModel : ViewModelBase
 
     public ObservableCollection<ImportItem> Items { get; } = [];
 
+    [ObservableProperty]
+    private bool more;
+
     public void AddItem(ImportItem item)
     {
-        Items.Add(item);
-        while (Items.Count > 12)
-        {
-            Items.RemoveAt(0);
-        }
+        Dispatcher.UIThread.Post(() => {
+            Items.Add(item);
+            while (Items.Count > 12)
+            {
+                Items.RemoveAt(0);
+                More = true;
+            }
+        });
     }
 
     public void MarkDone()
@@ -51,7 +58,10 @@ partial class ImageProgressViewModel : ViewModelBase
         if (existing == null)
         {
             existing = new ImportStatistics(state);
-            Statistics.Add(existing);
+            Dispatcher.UIThread.Post(() =>
+            {
+                Statistics.Add(existing);
+            });
         }
         existing.Count++;
     }
