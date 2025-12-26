@@ -25,7 +25,7 @@ public class SQLiteAlbum : IAlbum
         }
         if (File.Exists(path))
         {
-            throw new InvalidDataException($"File with at path {path} already exists");
+            throw new InvalidDataException($"File at path {path} already exists");
         }
         try
         {

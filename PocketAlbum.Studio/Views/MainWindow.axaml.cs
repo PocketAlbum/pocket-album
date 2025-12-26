@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 using PocketAlbum.Models;
 using PocketAlbum.SQLite;
 using PocketAlbum.Studio.Core;
@@ -32,17 +34,24 @@ public partial class MainWindow : Window
         var files = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
             Title = "Save album to file",
-            SuggestedFileName = $"{metadata.Name}.sqlite"
+            SuggestedFileName = $"{metadata.Name}.sqlite",
+            ShowOverwritePrompt = false
         });
         if (files == null)
         {
             return;
         }
-        if (DataContext is GalleryViewModel)
+        try {
+            if (DataContext is GalleryViewModel)
+            {
+                var path = files.Path.ToString()[8..];
+                await SQLiteAlbum.Create(path, metadata);
+                await OpenAlbum(path);
+            }
+        }
+        catch (Exception e)
         {
-            var path = files.Path.ToString()[8..];
-            await SQLiteAlbum.Create(path, metadata);
-            await OpenAlbum(path);
+            await ShowError(e.Message);
         }
     }
 
@@ -54,11 +63,25 @@ public partial class MainWindow : Window
             AllowMultiple = false
         });
 
-        if (files.SingleOrDefault()?.Path?.ToString() is string path && 
-            path.StartsWith("file://"))
-        {
-            await OpenAlbum(path[8..]);
+        try {
+            if (files.SingleOrDefault()?.Path?.ToString() is string path && 
+                path.StartsWith("file://"))
+            {
+                await OpenAlbum(path[8..]);
+            }
         }
+        catch (Exception e)
+        {
+            await ShowError(e.Message);
+        }
+    }
+
+    private async Task ShowError(string message)
+    {
+        await MessageBoxManager
+                .GetMessageBoxStandard("Error", message, ButtonEnum.Ok, 
+                    MsBox.Avalonia.Enums.Icon.Error)
+                .ShowAsync();
     }
 
     private async Task OpenAlbum(string path)
