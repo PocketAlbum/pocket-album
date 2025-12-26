@@ -17,7 +17,7 @@ public partial class MetadataWindow : Window
     {
         if (DataContext is MetadataViewModel mvm)
         {
-            if (string.IsNullOrWhiteSpace(mvm.Title))
+            if (string.IsNullOrWhiteSpace(mvm.Name))
             {
                 return;
             }
@@ -26,9 +26,9 @@ public partial class MetadataWindow : Window
                 Created = DateTime.Now,
                 Updated = DateTime.Now,
                 Id = Guid.NewGuid(),
-                Name = mvm.Title,
+                Name = mvm.Name,
                 Description = mvm.Description,
-                Version = "PocketAlbum 1.0"
+                Version = PocketAlbum.VersionName
             });
         }
     }

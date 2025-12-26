@@ -24,6 +24,7 @@
                 <MenuItem Header="_Exit" Click="ExitClick"/>
             </MenuItem>
             <MenuItem Header="_Manage">
+                <MenuItem Header="Edit details" Click="EditMetadataClick"/>
                 <MenuItem Header="Import from folder" Click="ImportImagesClick"/>
             </MenuItem>
         </Menu>

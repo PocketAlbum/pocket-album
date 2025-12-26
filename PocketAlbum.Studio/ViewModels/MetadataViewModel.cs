@@ -5,7 +5,7 @@ namespace PocketAlbum.Studio.ViewModels;
 public partial class MetadataViewModel : ViewModelBase
 {
     [ObservableProperty]
-    private string title = "Untitled";
+    private string name = "Untitled";
 
     [ObservableProperty]
     private string? description;

@@ -78,6 +78,11 @@ public class SQLiteAlbum : IAlbum
         return await MetadataHelper.Read(Connection);
     }
 
+    public async Task SetMetadata(MetadataModel metadata)
+    {
+        await MetadataHelper.Write(Connection, metadata);
+    }
+
     private string GetWhere(FilterModel filter) {
         if (!filter.HasAny) {
             return "TRUE";

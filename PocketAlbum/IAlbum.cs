@@ -6,6 +6,8 @@ public interface IAlbum
 {
     Task<MetadataModel> GetMetadata();
 
+    Task SetMetadata(MetadataModel metadata);
+
     Task<AlbumInfo> GetInfo(FilterModel filter);
 
     Task<byte[]> GetData(string id);

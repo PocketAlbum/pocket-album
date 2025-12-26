@@ -108,4 +108,34 @@ public partial class MainWindow : Window
             importer.Start();
         }
     }
+
+    public async void EditMetadataClick(object? sender, RoutedEventArgs args)
+    {
+        if (album != null)
+        {
+            var metadata = await album.GetMetadata();
+            MetadataWindow window = new MetadataWindow()
+            {
+                DataContext = new MetadataViewModel()
+                {
+                    Name = metadata.Name,
+                    Description = metadata.Description
+                }
+            };
+            var newMetadata = await window.ShowDialog<MetadataModel?>(this);
+            if (newMetadata == null)
+            {
+                return;
+            }
+            await album.SetMetadata(new MetadataModel
+            {
+                Id = metadata.Id,
+                Version = PocketAlbum.VersionName,
+                Name = newMetadata.Name,
+                Description = newMetadata.Description,
+                Created = metadata.Created,
+                Updated = DateTime.Now
+            });
+        }
+    }
 }

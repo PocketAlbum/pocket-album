@@ -16,7 +16,7 @@ public class MetadataModel
         return new MetadataModel
         {
             Id = Guid.NewGuid(),
-            Version = "PocketAlbum 1.0",
+            Version = PocketAlbum.VersionName,
             Name = name,
             Description = null,
             Created = DateTime.Now,
