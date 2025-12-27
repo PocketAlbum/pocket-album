@@ -17,8 +17,8 @@
     </Design.DataContext>
 
     <DockPanel LastChildFill="True">
-        <Grid ColumnDefinitions="100,*" RowDefinitions="Auto,Auto,Auto"  Margin="10"
-            DockPanel.Dock="Top">
+        <Grid ColumnDefinitions="100,*" RowDefinitions="Auto,Auto,Auto,Auto"  
+            Margin="10" DockPanel.Dock="Top">
 
             <TextBlock Grid.Row="0" Grid.Column="0" Margin="10" 
                 VerticalAlignment="Center" HorizontalAlignment="Right"
@@ -34,8 +34,14 @@
 
             <TextBlock Grid.Row="2" Grid.Column="0" Margin="10" 
                 VerticalAlignment="Center" HorizontalAlignment="Right"
-                Text="Total size" FontStyle="Italic" />
+                Text="Photos" FontStyle="Italic" />
             <TextBlock Grid.Row="2" Grid.Column="1"  Margin="10"
+                Text="{Binding TotalPhotos}" />
+
+            <TextBlock Grid.Row="3" Grid.Column="0" Margin="10" 
+                VerticalAlignment="Center" HorizontalAlignment="Right"
+                Text="Total size" FontStyle="Italic" />
+            <TextBlock Grid.Row="3" Grid.Column="1"  Margin="10"
                 Text="{Binding TotalSize}" />
 
         </Grid>

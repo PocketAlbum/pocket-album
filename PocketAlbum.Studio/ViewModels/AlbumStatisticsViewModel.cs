@@ -12,6 +12,8 @@ public partial class AlbumStatisticsViewModel : ViewModelBase
 
     public required List<YearIndex> YearIndex { get; init; }
 
+    public int TotalPhotos => YearIndex.Sum(i => i.Count);
+
     public string YearsSummary => YearIndex.Count == 1 ? 
         $"{YearIndex.First().Year} (1)" :
         $"{YearIndex.First().Year} - {YearIndex.Last().Year} ({YearIndex.Count})";
