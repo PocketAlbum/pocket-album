@@ -9,7 +9,8 @@
         x:Class="PocketAlbum.Studio.Views.ImageProgressWindow"
         x:DataType="vm:ImageProgressViewModel"
         Icon="/Assets/pocket_album_32.png"
-        Title="Import images">
+        Title="Import images"
+        WindowStartupLocation="CenterOwner">
 
     <Design.DataContext>
         <vm:ImageProgressViewModel/>

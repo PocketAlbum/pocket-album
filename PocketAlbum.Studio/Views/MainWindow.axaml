@@ -22,6 +22,7 @@
                 <Separator/>
                 <MenuItem Header="Statistics" Click="ShowStatisticsClick"/>
                 <Separator/>
+                <MenuItem Header="About" Click="AboutClick"/>
                 <MenuItem Header="_Exit" Click="ExitClick"/>
             </MenuItem>
             <MenuItem Header="_Manage">

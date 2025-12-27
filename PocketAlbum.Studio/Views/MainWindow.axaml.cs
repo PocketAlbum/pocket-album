@@ -178,4 +178,13 @@ public partial class MainWindow : Window
             await window.ShowDialog(this);
         }
     }
+
+    public async void AboutClick(object? sender, RoutedEventArgs args)
+    {
+        AboutWindow about = new AboutWindow()
+        {
+            DataContext = new AboutViewModel()
+        };
+        await about.ShowDialog(this);
+    }
 }

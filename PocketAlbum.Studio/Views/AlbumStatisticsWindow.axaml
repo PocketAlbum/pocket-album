@@ -9,7 +9,8 @@
         x:Class="PocketAlbum.Studio.Views.AlbumStatisticsWindow"
         x:DataType="vm:AlbumStatisticsViewModel"
         Icon="/Assets/pocket_album_32.png"
-        Title="Album statistics">
+        Title="Album statistics"
+        WindowStartupLocation="CenterOwner">
 
     <Design.DataContext>
         <vm:AlbumStatisticsViewModel/>

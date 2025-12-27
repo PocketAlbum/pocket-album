@@ -9,7 +9,8 @@
         x:Class="PocketAlbum.Studio.Views.MetadataWindow"
         x:DataType="vm:MetadataViewModel"
         Icon="/Assets/pocket_album_32.png"
-        Title="Album details">
+        Title="Album details"
+        WindowStartupLocation="CenterOwner">
 
     <Design.DataContext>
         <vm:MetadataViewModel/>
