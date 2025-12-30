@@ -147,7 +147,23 @@ public class SQLiteAlbum : IAlbum
         };
     }
 
-    public async Task<List<ImageThumbnail>> GetImages(FilterModel filter, Interval paging)
+    public async Task<List<ImageInfo>> List(FilterModel filter, Interval paging)
+    {
+        long count = paging.To - paging.From + 1;
+
+        string query = "SELECT \"id\", \"filename\", \"contentType\", \"created\", " +
+            "\"width\", \"height\", \"size\", \"latitude\", \"longitude\", " +
+            "\"crc\", " + filterQueries + " FROM image " +
+            $"WHERE {GetWhere(filter)} " +
+            "ORDER BY created ASC " +
+            $"LIMIT {paging.From}, {count}";
+
+        var images = await Connection.QueryAsync<SQLiteImage>(query);
+
+        return images.Select(ConvertImage).ToList();
+    }
+
+    public async Task<List<ImageThumbnail>> ListThumbnails(FilterModel filter, Interval paging)
     {
         long count = paging.To - paging.From + 1;
 
@@ -167,11 +183,25 @@ public class SQLiteAlbum : IAlbum
         }).ToList();
     }
 
-    public async Task<byte[]> GetData(string id)
+    public async Task<ImageInfo> GetImageInfo(string id)
+    {
+        var image = await Connection.Table<SQLiteImage>()
+            .FirstAsync(x => x.Id == id);
+        return ConvertImage(image);
+    }
+
+    public async Task<byte[]> GetImageData(string id)
     {
         var image = await Connection.Table<SQLiteImage>()
             .FirstAsync(x => x.Id == id);
         return image.Data!;
+    }
+
+    public async Task<byte[]> GetImageThumbnail(string id)
+    {
+        var image = await Connection.Table<SQLiteImage>()
+            .FirstAsync(x => x.Id == id);
+        return image.Thumbnail!;
     }
 
     private static ImageInfo ConvertImage(SQLiteImage sqliteImage)

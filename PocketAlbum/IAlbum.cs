@@ -10,9 +10,15 @@ public interface IAlbum : IAsyncDisposable
 
     Task<AlbumInfo> GetInfo(FilterModel filter);
 
-    Task<byte[]> GetData(string id);
+    Task<ImageInfo> GetImageInfo(string id);
 
-    Task<List<ImageThumbnail>> GetImages(FilterModel filter, Interval paging);
+    Task<byte[]> GetImageData(string id);
+
+    Task<byte[]> GetImageThumbnail(string id);
+
+    Task<List<ImageInfo>> List(FilterModel filter, Interval paging);
+
+    Task<List<ImageThumbnail>> ListThumbnails(FilterModel filter, Interval paging);
 
     Task<bool> ImageExists(string id);
 

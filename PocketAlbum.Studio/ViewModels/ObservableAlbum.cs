@@ -60,7 +60,7 @@ public class ObservableAlbum : IReadOnlyList<GalleryItem>
             int first = block * BLOCK_SIZE;
             int last = (block + 1) * BLOCK_SIZE - 1;
 
-            return await album.GetImages(filter, new Interval(first, last));
+            return await album.ListThumbnails(filter, new Interval(first, last));
         }
         catch (Exception e)
         {
@@ -84,6 +84,6 @@ public class ObservableAlbum : IReadOnlyList<GalleryItem>
 
     public async Task<byte[]> GetData(string id)
     {
-        return await album.GetData(id);
+        return await album.GetImageData(id);
     }
 }
