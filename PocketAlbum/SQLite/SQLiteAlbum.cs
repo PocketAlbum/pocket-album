@@ -258,4 +258,9 @@ public class SQLiteAlbum : IAlbum
     {
         await Connection.DeleteAsync<SQLiteYearIndex>(year);
     }
+
+    public async ValueTask DisposeAsync()
+    {
+        await Connection.CloseAsync();
+    }
 }

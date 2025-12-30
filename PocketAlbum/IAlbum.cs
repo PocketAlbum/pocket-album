@@ -2,7 +2,7 @@ using PocketAlbum.Models;
 
 namespace PocketAlbum;
 
-public interface IAlbum
+public interface IAlbum : IAsyncDisposable
 {
     Task<MetadataModel> GetMetadata();
 
