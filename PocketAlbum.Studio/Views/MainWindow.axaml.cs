@@ -44,7 +44,7 @@ public partial class MainWindow : Window
         try {
             if (DataContext is GalleryViewModel)
             {
-                var path = files.Path.ToString()[8..];
+                var path = files.Path.ToString()[7..];
                 await SQLiteAlbum.Create(path, metadata);
                 await OpenAlbum(path);
             }
@@ -67,12 +67,12 @@ public partial class MainWindow : Window
             if (files.SingleOrDefault()?.Path?.ToString() is string path && 
                 path.StartsWith("file://"))
             {
-                await OpenAlbum(path[8..]);
+                await OpenAlbum(path[7..]);
             }
         }
         catch (Exception e)
         {
-            await ShowError(e.Message);
+            await ShowError(e.Message + "\n" + e.InnerException?.Message + "\n" + e.InnerException?.Message);
         }
     }
 
