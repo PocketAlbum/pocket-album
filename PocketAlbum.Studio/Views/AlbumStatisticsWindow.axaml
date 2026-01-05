@@ -3,8 +3,8 @@
         xmlns:vm="using:PocketAlbum.Studio.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="360" d:DesignHeight="400"
-        Width="360" Height="400"
+        mc:Ignorable="d" d:DesignWidth="510" d:DesignHeight="400"
+        Width="510" Height="400"
         xmlns:controls="clr-namespace:PocketAlbum.Studio.Views"
         x:Class="PocketAlbum.Studio.Views.AlbumStatisticsWindow"
         x:DataType="vm:AlbumStatisticsViewModel"
@@ -32,33 +32,37 @@
             <TextBlock Grid.Row="1" Grid.Column="1"  Margin="10"
                 Text="{Binding YearsSummary}" />
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Margin="10" 
-                VerticalAlignment="Center" HorizontalAlignment="Right"
-                Text="Photos" FontStyle="Italic" />
-            <TextBlock Grid.Row="2" Grid.Column="1"  Margin="10"
-                Text="{Binding TotalPhotos}" />
-
-            <TextBlock Grid.Row="3" Grid.Column="0" Margin="10" 
-                VerticalAlignment="Center" HorizontalAlignment="Right"
-                Text="Total size" FontStyle="Italic" />
-            <TextBlock Grid.Row="3" Grid.Column="1"  Margin="10"
-                Text="{Binding TotalSize}" />
-
         </Grid>
 
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="32,0">
-            <TextBlock Text="Year" Width="50" Margin="10" />
-            <TextBlock Text="Images" Width="80" Margin="10" TextAlignment="Right" />
-            <TextBlock Text="Size" Width="80" Margin="10" TextAlignment="Right" />
+            <TextBlock Text="Year" Width="50" Margin="10" FontWeight="Bold" />
+            <TextBlock Text="Images" Width="50" Margin="10" TextAlignment="Right" FontWeight="Bold" />
+            <TextBlock Text="Full Size" Width="80" Margin="10" TextAlignment="Right" FontWeight="Bold" />
+            <TextBlock Text="Compressed" Width="90" Margin="10" TextAlignment="Right" FontWeight="Bold" />
+            <TextBlock Text="Thumbnails" Width="80" Margin="10" TextAlignment="Right" FontWeight="Bold" />
         </StackPanel>
-        <ListBox ItemsSource="{Binding YearIndex}" Margin="20,0,20,20" >
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="32,0">
+            <TextBlock Text="SUM" Width="50" Margin="10" />
+            <TextBlock Text="{Binding TotalPhotos}" Width="50" Margin="10" TextAlignment="Right" />
+            <TextBlock Text="{Binding TotalSize, Converter={x:Static controls:Converters.FormatSize}}" 
+                Width="80" Margin="10" TextAlignment="Right" />
+            <TextBlock Text="{Binding CompressedSize, Converter={x:Static controls:Converters.FormatSize}}" 
+                Width="90" Margin="10" TextAlignment="Right" />
+            <TextBlock Text="{Binding ThumbnailsSize, Converter={x:Static controls:Converters.FormatSize}}" 
+                Width="80" Margin="10" TextAlignment="Right" />
+        </StackPanel>
+        <ListBox ItemsSource="{Binding Years}" Margin="20,0,20,20" >
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding Year}" Width="50" Margin="10,0" />
-                        <TextBlock Text="{Binding Count}" Width="80" Margin="10,0" TextAlignment="Right" />
+                        <TextBlock Text="{Binding Count}" Width="50" Margin="10,0" TextAlignment="Right" />
                         <TextBlock Width="80" Margin="10,0" TextAlignment="Right"
-                            Text="{Binding Size, Converter={x:Static controls:Converters.FormatSize}}" />
+                            Text="{Binding FullSize, Converter={x:Static controls:Converters.FormatSize}}" />
+                        <TextBlock Width="90" Margin="10,0" TextAlignment="Right"
+                            Text="{Binding CompressedSize, Converter={x:Static controls:Converters.FormatSize}}" />
+                        <TextBlock Width="80" Margin="10,0" TextAlignment="Right"
+                            Text="{Binding ThumbnailsSize, Converter={x:Static controls:Converters.FormatSize}}" />
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
