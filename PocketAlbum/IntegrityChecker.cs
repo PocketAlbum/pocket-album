@@ -55,7 +55,7 @@ public static class IntegrityChecker
 
         invalidYears.AddRange(index.Select(y => y.Year));
 
-        return invalidYears.Order().ToList();
+        return invalidYears.Distinct().Order().ToList();
     }
 
     /// <summary>
