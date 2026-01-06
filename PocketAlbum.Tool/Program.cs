@@ -37,16 +37,14 @@ internal class Program
                 album = await SQLiteAlbum.Create(albumPath, MetadataModel.Create(name));
             }
             
-
-            IntegrityChecker checker = new IntegrityChecker(album);
-            await CheckIndex(checker);
+            await CheckIndex(album);
 
             ImageImporter importer = new ImageImporter(album);
             await AddRecursively(importer, GetImagesLocation());
 
             Console.WriteLine("Import finished, starting to build index");
 
-            await CheckIndex(checker);
+            await CheckIndex(album);
         }
         catch (Exception e)
         {
@@ -68,12 +66,12 @@ internal class Program
         return name;
     }
 
-    static async Task CheckIndex(IntegrityChecker checker)
+    static async Task CheckIndex(IAlbum album)
     {
-        foreach (var year in await checker.InvalidYears())
+        foreach (var year in await IntegrityChecker.InvalidYears(album))
         {
             Console.WriteLine("Indexing year " + year);
-            await checker.CheckYear(year);
+            await IntegrityChecker.CheckYear(album, year);
         }
     }
 

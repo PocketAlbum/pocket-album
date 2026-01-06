@@ -25,6 +25,11 @@ partial class ImageProgressViewModel : ViewModelBase
     [ObservableProperty]
     private bool done;
 
+    public bool ShowProgressBar { get; init; }
+
+    [ObservableProperty]
+    public double progress;
+
     public ObservableCollection<ImportStatistics> Statistics { get; } = [];
 
     public ObservableStopwatch TimeSinceStart { get; } = new(TimeSpan.FromSeconds(1));

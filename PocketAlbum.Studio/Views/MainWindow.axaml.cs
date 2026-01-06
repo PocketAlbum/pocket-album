@@ -159,7 +159,7 @@ public partial class MainWindow : Window
     {
         if (DataContext is GalleryViewModel gvm)
         {
-            gvm.CloseAlbum();
+            await gvm.CloseAlbum();
         }
     }
 
@@ -181,5 +181,28 @@ public partial class MainWindow : Window
             DataContext = new AboutViewModel()
         };
         await about.ShowDialog(this);
+    }
+
+    public async void SynchronizeClick(object? sender, RoutedEventArgs args)
+    {
+        if (DataContext is GalleryViewModel gvm && gvm.Album is IAlbum album)
+        {
+            var file = await StorageProvider.OpenFilePickerAsync(
+                new FilePickerOpenOptions { 
+                    Title = "Select album file to synchronize",
+                    AllowMultiple = false
+                });
+            if (!file.Any())
+            {
+                return;
+            }
+            var path = file.Single().Path.ToString().Substring(8);
+            await using (IAlbum otherAlbum = await SQLiteAlbum.Open(path))
+            {
+                AlbumSynchronizer synchronizer = new AlbumSynchronizer(album, otherAlbum);
+                await synchronizer.Start(this);
+                await gvm.OpenAlbum(album, gvm.AlbumPath);
+            }
+        }
     }
 }

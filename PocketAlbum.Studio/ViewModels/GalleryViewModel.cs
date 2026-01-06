@@ -44,10 +44,12 @@ public partial class GalleryViewModel : ObservableObject
 
     public async Task OpenAlbum(IAlbum album, string path)
     {
+        await CloseAlbum();
+        
         Progress = 0;
         OnPropertyChanged(nameof(HasProgress));
         OnPropertyChanged(nameof(StatusString));
-        await new IntegrityChecker(album).CheckAllYears(p =>
+        await IntegrityChecker.CheckAllYears(album, p =>
         {
             Progress = p * 0.9;
         });
@@ -64,9 +66,12 @@ public partial class GalleryViewModel : ObservableObject
         OnPropertyChanged(nameof(WindowTitle));
     }
 
-    internal void CloseAlbum()
+    internal async Task CloseAlbum()
     {
-        Album = null;
+        if (Album != null) {
+            await Album.DisposeAsync();
+            Album = null;
+        }
         Images = null;
         AlbumPath = "";
         OnPropertyChanged(nameof(HasImages));

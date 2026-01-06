@@ -2,22 +2,24 @@ using PocketAlbum.Models;
 
 namespace PocketAlbum;
 
-public class IntegrityChecker(IAlbum album)
+public static class IntegrityChecker
 {
-    private readonly IAlbum album = album;
-
-    public async Task CheckAllYears(Action<double>? progress = null)
+    public static async Task CheckAllYears(IAlbum album, 
+        Action<double>? progress = null)
     {
-        var invalidYears = await InvalidYears(p => progress?.Invoke(p * 0.1));
-        await CheckYears(invalidYears, p => progress?.Invoke(0.1 + (p * 0.9)));
+        var invalidYears = await InvalidYears(album, 
+            p => progress?.Invoke(p * 0.1));
+        await CheckYears(album, invalidYears, 
+            p => progress?.Invoke(0.1 + (p * 0.9)));
     }
 
-    private async Task CheckYears(List<int> years, Action<double>? progress = null)
+    public static async Task CheckYears(IAlbum album, List<int> years, 
+        Action<double>? progress = null)
     {
         for (int i = 0; i < years.Count; i++)
         {
             progress?.Invoke((double)i / years.Count);
-            await CheckYear(years[i]);
+            await CheckYear(album, years[i]);
         }
     }
 
@@ -27,7 +29,8 @@ public class IntegrityChecker(IAlbum album)
     /// each year and fix the index.
     /// </summary>
     /// <returns>list of years for which integrity check failed</returns>
-    public async Task<List<int>> InvalidYears(Action<double>? progress = null)
+    public static async Task<List<int>> InvalidYears(IAlbum album, 
+        Action<double>? progress = null)
     {
         var info = await album.GetInfo(new FilterModel());
         var index = await album.GetYearIndex();
@@ -60,7 +63,7 @@ public class IntegrityChecker(IAlbum album)
     /// </summary>
     /// <param name="year">year</param>
     /// <returns></returns>
-    public async Task CheckYear(int year)
+    public static async Task CheckYear(IAlbum album, int year)
     {
         var filter = new FilterModel() { Year = new Interval(year) };
         var info = await album.GetInfo(filter);
@@ -79,10 +82,12 @@ public class IntegrityChecker(IAlbum album)
             .OrderBy(i => i.Id)
             .Select(i => (i.Crc, i.Size))
             .Aggregate((img1, img2) => {
-                var newCrc = CrcUtilities.CombineCrc32(img1.Crc, img2.Crc, img2.Size);
+                var newCrc = CrcUtilities
+                    .CombineCrc32(img1.Crc, img2.Crc, img2.Size);
                 return (newCrc, img1.Size + img2.Size);
             });
 
+        await album.RemoveYearIndex(year);
         await album.StoreYearIndex(new YearIndex {
             Year = year,
             Count = images.Count,

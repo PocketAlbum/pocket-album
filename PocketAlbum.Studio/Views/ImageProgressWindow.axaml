@@ -24,11 +24,6 @@
             Text="{Binding ProcessName}" />
         <TextBlock 
             DockPanel.Dock="Top" 
-            Margin="10,10,10,0" 
-            Text="Current location:"
-            FontStyle="Italic" />
-        <TextBlock 
-            DockPanel.Dock="Top" 
             Margin="10,5,10,10"  
             Text="{Binding Location}" />
         <StackPanel 
@@ -46,6 +41,12 @@
                 Margin="20,5" 
                 Text="{Binding TimeSinceStart.ElapsedString}" />
         </StackPanel>
+        <ProgressBar 
+            DockPanel.Dock="Top" 
+            Margin="10,10,10,0" 
+            Value="{Binding Progress}"
+            Maximum="1"
+            IsVisible="{Binding ShowProgressBar}" />
         <ItemsControl 
             ItemsSource="{Binding Statistics}" 
             DockPanel.Dock="Top"
