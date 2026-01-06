@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using MsBox.Avalonia.Enums;
 using PocketAlbum.Studio.ViewModels;
 using PocketAlbum.Studio.Views;
 using static PocketAlbum.ImageImporter;
@@ -43,12 +44,14 @@ public class RecursiveFilesImporter
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                progressWindow.ShowMessage("Error", e.Message, Icon.Error);
+                return;
             }
             finally
             {
                 progressModel.MarkDone();
             }
+            progressWindow.ShowMessage("Success", "Import finished", Icon.Success);
         });
         await progressWindow.ShowDialog(owner);
     }

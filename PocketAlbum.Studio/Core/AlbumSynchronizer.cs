@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Avalonia.Threading;
-using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using PocketAlbum.Studio.ViewModels;
 using PocketAlbum.Studio.Views;
@@ -46,27 +44,16 @@ public class AlbumSynchronizer
             }
             catch (Exception e)
             {
-                ShowMessage("Error", e.Message, Icon.Error);
+                progressWindow.ShowMessage("Error", e.Message, Icon.Error);
                 return;
             }
             finally
             {
                 progressModel.MarkDone();
             }
-            ShowMessage("Success", "Synchronization finished", Icon.Success);
+            progressWindow.ShowMessage("Success", "Synchronization finished", Icon.Success);
         });
         await progressWindow.ShowDialog(owner);
-    }
-
-    private void ShowMessage(string caption, string message, Icon icon)
-    {
-        Dispatcher.UIThread.Post(async () =>
-        {
-            await MessageBoxManager
-                .GetMessageBoxStandard(caption, message, ButtonEnum.Ok, icon)
-                .ShowAsync();
-            progressWindow.Close();
-        });
     }
 
     private async Task VerifyIntegrity()
