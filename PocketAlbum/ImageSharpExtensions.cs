@@ -34,11 +34,14 @@ internal static class ImageSharpExtensions
         var value = exif
                     .FirstOrDefault(e => e.Tag.ToString() == name)?
                     .GetValue();
-        if (value == null)
+        var refValue = exif
+                    .FirstOrDefault(e => e.Tag.ToString() == name + "Ref")?
+                    .GetValue();
+        if (value == null || refValue == null)
         {
             return null;
         }
-        if (value is Rational[] rationalArray)
+        if (value is Rational[] rationalArray && refValue is string refString)
         {
             decimal result = 0;
             for (int i = 0; i < Math.Min(3, rationalArray.Length); i++)
@@ -46,6 +49,11 @@ internal static class ImageSharpExtensions
                 decimal part = (decimal)rationalArray[i].Numerator 
                     / rationalArray[i].Denominator;
                 result += part / (decimal)Math.Pow(60, i);
+            }
+            if (refString.Equals("S", StringComparison.InvariantCultureIgnoreCase) ||
+                refString.Equals("W", StringComparison.InvariantCultureIgnoreCase))
+            {
+                result *= -1;
             }
             return (double)result;
         }
