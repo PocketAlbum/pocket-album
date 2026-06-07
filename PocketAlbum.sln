@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PocketAlbum.Studio", "Pocke
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PocketAlbum.Test", "PocketAlbum.Test\PocketAlbum.Test.csproj", "{A702C939-7D39-726F-0AC9-2E474501A512}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PocketAlbum.Server", "PocketAlbum.Server\PocketAlbum.Server.csproj", "{6EBC0465-2816-4458-BCDE-DBB57C86555C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{A702C939-7D39-726F-0AC9-2E474501A512}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A702C939-7D39-726F-0AC9-2E474501A512}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A702C939-7D39-726F-0AC9-2E474501A512}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EBC0465-2816-4458-BCDE-DBB57C86555C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EBC0465-2816-4458-BCDE-DBB57C86555C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EBC0465-2816-4458-BCDE-DBB57C86555C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EBC0465-2816-4458-BCDE-DBB57C86555C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
