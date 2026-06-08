@@ -2,6 +2,6 @@ namespace PocketAlbum.Studio.ViewModels;
 
 public partial class AboutViewModel : ViewModelBase
 {
-    public string Version => PocketAlbum.VersionString;
+    public string Version => PocketAlbumConstants.VersionString;
 
 }

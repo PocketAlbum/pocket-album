@@ -146,7 +146,7 @@ public partial class MainWindow : Window
             await album.SetMetadata(new MetadataModel
             {
                 Id = metadata.Id,
-                Version = PocketAlbum.VersionName,
+                Version = PocketAlbumConstants.VersionName,
                 Name = newMetadata.Name,
                 Description = newMetadata.Description,
                 Created = metadata.Created,

@@ -11,6 +11,8 @@ namespace PocketAlbum.Server.Services;
 public interface IAuthService
 {
     Guid InstanceId { get; }
+
+    ServerInfo GetServerInfo(ICollection<string> urls);
     string RequestToken(TokenRequest request);
 }
 
@@ -77,5 +79,14 @@ public class AuthService(IConfiguration config) : IAuthService
             code = Console.ReadLine();
         } while (code == null);
         return code.Trim();
+    }
+
+    public ServerInfo GetServerInfo(ICollection<string> urls)
+    {
+        return new ServerInfo()
+        {
+            InstanceId = InstanceId,
+            Endpoints = HostingUtil.GetEndpoints(urls)
+        };
     }
 }

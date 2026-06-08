@@ -28,7 +28,7 @@ public partial class MetadataWindow : Window
                 Id = Guid.NewGuid(),
                 Name = mvm.Name,
                 Description = mvm.Description,
-                Version = PocketAlbum.VersionName
+                Version = PocketAlbumConstants.VersionName
             });
         }
     }

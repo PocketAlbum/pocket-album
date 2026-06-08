@@ -20,7 +20,7 @@ public partial class GalleryViewModel : ObservableObject
 
     public bool HasProgress => Progress.HasValue;
 
-    public string WindowTitle => $"PocketAlbum Studio {PocketAlbum.VersionString}{(AlbumPath != "" ? "  -  " : "")}{AlbumPath}";
+    public string WindowTitle => $"PocketAlbum Studio {PocketAlbumConstants.VersionString}{(AlbumPath != "" ? "  -  " : "")}{AlbumPath}";
 
     public string StatusString
     {
