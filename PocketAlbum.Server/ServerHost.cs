@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using PocketAlbum.Models;
+using PocketAlbum.Server.Controllers;
 using PocketAlbum.Server.Services;
 using PocketAlbum.SQLite;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace PocketAlbum.Server;
 
@@ -37,6 +40,11 @@ public class ServerHost(string[] args, List<IAlbum>? preloadedAlbums = null)
             }
         }
 
+        builder.Services.ConfigureHttpJsonOptions(options =>
+        {
+            options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
+        });
+
         var jwtSettings = builder.Configuration.GetSection("Jwt");
         var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
@@ -62,13 +70,14 @@ public class ServerHost(string[] args, List<IAlbum>? preloadedAlbums = null)
             });
         builder.Services.AddSingleton<IAuthService, AuthService>();
         builder.Services.AddSingleton(new AlbumService(albums));
-        builder.Services.AddControllers();
+        builder.Services.AddAuthorization();
 
         app = builder.Build();
 
         app.UseAuthentication();
         app.UseAuthorization();
-        app.MapControllers();
+        app.MapAlbumEndpoints();
+        app.MapAuthEndpoints();
 
         appTask = app.RunAsync("http://0.0.0.0:0");
 
@@ -101,4 +110,17 @@ public class ServerHost(string[] args, List<IAlbum>? preloadedAlbums = null)
         }
         else throw new IOException("File doesn't exist");
     }
+
+}
+
+[JsonSerializable(typeof(TokenRequest))]
+[JsonSerializable(typeof(ServerInfo))]
+[JsonSerializable(typeof(List<MetadataModel>))]
+[JsonSerializable(typeof(List<YearIndex>))]
+[JsonSerializable(typeof(List<ImageInfo>))]
+[JsonSerializable(typeof(byte[]))]
+[JsonSerializable(typeof(AlbumInfo))]
+[JsonSerializable(typeof(FilterModel))]
+public partial class AppJsonSerializerContext : JsonSerializerContext
+{
 }

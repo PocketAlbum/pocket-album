@@ -1,43 +1,56 @@
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
-using Microsoft.AspNetCore.Mvc;
 using PocketAlbum.Server.Services;
 
 namespace PocketAlbum.Server.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class AuthController(IAuthService authService, IServer server) : ControllerBase
+public static class AuthEndpoints
 {
-    private readonly IAuthService authService = authService;
-    private readonly IServer server = server;
-
-    public IActionResult GetServerInfo()
+    public static IEndpointRouteBuilder MapAuthEndpoints(
+        this IEndpointRouteBuilder app)
     {
-        var addressesFeature = server.Features.Get<IServerAddressesFeature>();
+        var group = app.MapGroup("/api/auth");
 
-        if (addressesFeature == null || !addressesFeature.Addresses.Any())
-        {
-            return NotFound("No listening addresses could be found.");
-        }
+        group.MapGet("/", GetServerInfo);
+        group.MapPost("/pair", Pair);
 
-        return Ok(authService.GetServerInfo(addressesFeature.Addresses));
+        return app;
     }
 
-    [HttpPost("pair")]
-    public IActionResult Pair([FromBody] TokenRequest tokenRequest)
+    private static IResult GetServerInfo(
+        IAuthService authService,
+        IServer server)
+    {
+        var addressesFeature =
+            server.Features.Get<IServerAddressesFeature>();
+
+        if (addressesFeature == null ||
+            !addressesFeature.Addresses.Any())
+        {
+            return Results.NotFound(
+                "No listening addresses could be found.");
+        }
+
+        return Results.Ok(
+            authService.GetServerInfo(addressesFeature.Addresses));
+    }
+
+    private static IResult Pair(
+        TokenRequest tokenRequest,
+        IAuthService authService)
     {
         try
         {
-            return Ok(authService.RequestToken(tokenRequest));
+            return Results.Ok(
+                authService.RequestToken(tokenRequest));
         }
         catch (ArgumentException ex)
         {
-            return BadRequest(ex.Message);
+            return Results.BadRequest(ex.Message);
         }
-        catch (Exception ex)
+        catch
         {
-            return Unauthorized(ex.Message);
+            return Results.Unauthorized();
         }
     }
 }

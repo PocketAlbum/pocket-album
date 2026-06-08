@@ -1,86 +1,106 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using PocketAlbum.Models;
 using PocketAlbum.Server.Services;
 
 namespace PocketAlbum.Server.Controllers;
 
-[ApiController]
-[Authorize]
-public class AlbumController(AlbumService service) : ControllerBase
+public static class AlbumEndpoints
 {
-    private readonly AlbumService service = service;
+    public static IEndpointRouteBuilder MapAlbumEndpoints(
+        this IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/albums")
+            .RequireAuthorization();
 
-    [AllowAnonymous]
-    [HttpGet("/api/albums")]
-    public async Task<IActionResult> GetAlbums()
+        group.MapGet("/", GetAlbums).AllowAnonymous();
+        group.MapGet("/{albumId:guid}/index", GetAlbumIndex);
+        group.MapGet("/{albumId:guid}/list", ListImages);
+        group.MapGet("/{albumId:guid}/images/{imageId}", GetImage);
+        group.MapGet("/{albumId:guid}/thumbnails/{imageId}", GetThumbnail);
+        group.MapGet("/{albumId:guid}/info", GetInfo);
+
+        return app;
+    }
+
+    private static async Task<IResult> GetAlbums(
+        AlbumService service)
     {
         var metaList = service.Albums.Values
             .Select(async a => await a.GetMetadata())
             .Select(m => m.Result)
             .ToList();
-        return Ok(metaList);
+
+        return Results.Ok(metaList);
     }
 
-    [HttpGet("/api/albums/{albumId}/index")]
-    public async Task<IActionResult> GetAlbumIndex([FromRoute] Guid albumId)
+    private static async Task<IResult> GetAlbumIndex(
+        Guid albumId,
+        AlbumService service)
     {
         if (!service.Albums.TryGetValue(albumId, out var album))
         {
-            return NotFound($"Album with id {albumId} not found");
+            return Results.NotFound($"Album with id {albumId} not found");
         }
-        return Ok(await album.GetYearIndex());
+
+        return Results.Ok(await album.GetYearIndex());
     }
 
-    [HttpGet("/api/albums/{albumId}/list")]
-    public async Task<IActionResult> ListImages(
-        [FromRoute] Guid albumId,
-        [FromQuery] FilterModel filter,
-        [FromQuery] int index = 0,
-        [FromQuery] int page = 100)
+    private static async Task<IResult> ListImages(
+        Guid albumId,
+        FilterModel filter,
+        int index,
+        int page,
+        AlbumService service)
     {
         if (!service.Albums.TryGetValue(albumId, out var album))
         {
-            return NotFound($"Album with id {albumId} not found");
+            return Results.NotFound($"Album with id {albumId} not found");
         }
+
         var paging = new Interval(index * page, ((index + 1) * page) - 1);
-        return Ok(await album.List(filter, paging));
+
+        return Results.Ok(await album.List(filter, paging));
     }
 
-    [HttpGet("/api/albums/{albumId}/images/{imageId}")]
-    public async Task<IActionResult> GetImage(
-        [FromRoute] Guid albumId,
-        [FromRoute] string imageId)
+    private static async Task<IResult> GetImage(
+        Guid albumId,
+        string imageId,
+        AlbumService service)
     {
         if (!service.Albums.TryGetValue(albumId, out var album))
         {
-            return NotFound($"Album with id {albumId} not found");
+            return Results.NotFound($"Album with id {albumId} not found");
         }
-        return File(await album.GetImageData(imageId), "image/jpeg");
+
+        return Results.File(
+            await album.GetImageData(imageId),
+            "image/jpeg");
     }
 
-
-    [HttpGet("/api/albums/{albumId}/thumbnails/{imageId}")]
-    public async Task<IActionResult> GetThumbnail(
-        [FromRoute] Guid albumId,
-        [FromRoute] string imageId)
+    private static async Task<IResult> GetThumbnail(
+        Guid albumId,
+        string imageId,
+        AlbumService service)
     {
         if (!service.Albums.TryGetValue(albumId, out var album))
         {
-            return NotFound($"Album with id {albumId} not found");
+            return Results.NotFound($"Album with id {albumId} not found");
         }
-        return File(await album.GetImageThumbnail(imageId), "image/jpeg");
+
+        return Results.File(
+            await album.GetImageThumbnail(imageId),
+            "image/jpeg");
     }
 
-    [HttpGet("/api/albums/{albumId}/info")]
-    public async Task<IActionResult> GetInfo(
-        [FromRoute] Guid albumId,
-        [FromQuery] FilterModel filter)
+    private static async Task<IResult> GetInfo(
+        Guid albumId,
+        FilterModel filter,
+        AlbumService service)
     {
         if (!service.Albums.TryGetValue(albumId, out var album))
         {
-            return NotFound($"Album with id {albumId} not found");
+            return Results.NotFound($"Album with id {albumId} not found");
         }
-        return Ok(await album.GetInfo(filter));
+
+        return Results.Ok(await album.GetInfo(filter));
     }
 }
