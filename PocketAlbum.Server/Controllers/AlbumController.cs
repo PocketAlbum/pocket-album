@@ -1,13 +1,17 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PocketAlbum.Models;
 using PocketAlbum.Server.Services;
 
 namespace PocketAlbum.Server.Controllers;
 
-public class AlbumController(AlbumService service) : Controller
+[ApiController]
+[Authorize]
+public class AlbumController(AlbumService service) : ControllerBase
 {
     private readonly AlbumService service = service;
 
+    [AllowAnonymous]
     [HttpGet("/api/albums")]
     public async Task<IActionResult> GetAlbums()
     {

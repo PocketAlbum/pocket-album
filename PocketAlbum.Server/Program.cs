@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using PocketAlbum.Server.Services;
 using PocketAlbum.SQLite;
+using System.Text;
 
 namespace PocketAlbum.Server;
 
@@ -37,11 +40,37 @@ public class Program
             }
         }
 
+        var jwtSettings = builder.Configuration.GetSection("Jwt");
+        var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+
+        builder.Services
+            .AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtSettings["Issuer"],
+                    ValidAudience = jwtSettings["Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ClockSkew = TimeSpan.Zero // Removes the default 5-minute grace period
+                };
+            });
+        builder.Services.AddSingleton<IAuthService, AuthService>();
         builder.Services.AddSingleton(new AlbumService(albums));
         builder.Services.AddControllers();
 
         var app = builder.Build();
 
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.MapControllers();
 
         app.Run();
