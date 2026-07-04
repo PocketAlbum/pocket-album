@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using MsBox.Avalonia;
@@ -82,6 +83,20 @@ public partial class MainWindow : Window
                 .GetMessageBoxStandard("Error", message, ButtonEnum.Ok, 
                     MsBox.Avalonia.Enums.Icon.Error)
                 .ShowAsync();
+    }
+
+    private void Image_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed &&
+            sender is Image i &&
+            i.DataContext is GalleryItem gi &&
+            DataContext is GalleryViewModel gvm &&
+            gvm.SelectedImage?.Id != gi.Id)
+        {
+            var item = new SlideshowItem(gvm.Album, gi.Id);
+            _ = item.EnsureLoadedAsync();
+            gvm.SelectedImage = item;
+        }
     }
 
     private async Task OpenAlbum(string path)

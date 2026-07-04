@@ -1,39 +1,24 @@
-using System.ComponentModel;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace PocketAlbum.Studio.ViewModels;
 
-public class GalleryItem : INotifyPropertyChanged
+public partial class GalleryItem(ObservableAlbum album, int index) : ObservableObject
 {
+    [ObservableProperty]
     private Bitmap? preview;
     private bool loading;
-    private readonly ObservableAlbum album;
-    public int Index { get; }
+    private readonly ObservableAlbum album = album;
+    public int Index { get; } = index;
+    public string Id { get; private set; }
 
     public string Text => Index.ToString();
 
-    public Bitmap? Preview
-    {
-        get => preview;
-        private set
-        {
-            preview = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public GalleryItem(ObservableAlbum album, int index)
-    {
-        this.album = album;
-        Index = index;
-    }
-
     public async Task EnsureLoadedAsync()
     {
-        if (loading || preview != null)
+        if (loading || Preview != null)
             return;
 
         loading = true;
@@ -41,6 +26,7 @@ public class GalleryItem : INotifyPropertyChanged
         await Task.Run(async () =>
         {
             var images = await album.GetImage(Index);
+            Id = images.Info.Id;
             using var stream = new MemoryStream(images.Thumbnail);
             var bmp = new Bitmap(stream);
             Preview = bmp;
@@ -54,8 +40,4 @@ public class GalleryItem : INotifyPropertyChanged
         Preview?.Dispose();
         Preview = null;
     }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected void OnPropertyChanged([CallerMemberName] string? prop = null) =>
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
 }

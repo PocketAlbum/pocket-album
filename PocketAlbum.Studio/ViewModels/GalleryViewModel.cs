@@ -9,6 +9,9 @@ public partial class GalleryViewModel : ObservableObject
     [ObservableProperty]
     private IReadOnlyList<GalleryItem>? images;
 
+    [ObservableProperty]
+    private SlideshowItem? selectedImage;
+
     public IAlbum? Album;
 
     public bool HasImages => Album != null && (Images?.Count ?? 0) > 0;

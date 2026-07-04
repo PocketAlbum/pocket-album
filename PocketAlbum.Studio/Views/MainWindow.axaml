@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:PocketAlbum.Studio.ViewModels"
+        xmlns:v="using:PocketAlbum.Studio.Views"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="450"
@@ -10,7 +11,7 @@
         Title="{Binding WindowTitle}">
 
     <Design.DataContext>
-        <vm:GalleryViewModel/>
+        <vm:GalleryViewModel x:Name="galleryViewModel" />
     </Design.DataContext>
 
     <DockPanel LastChildFill="True">
@@ -42,24 +43,42 @@
                 <ProgressBar Value="{Binding Progress}" Maximum="1" 
                     IsVisible="{Binding HasProgress}" />
             </StackPanel>
-            <ScrollViewer IsVisible="{Binding HasImages}">
-                <ItemsRepeater ItemsSource="{Binding Images}" ElementPrepared="OnElementPrepared">
-                    <ItemsRepeater.Layout>
-                        <UniformGridLayout 
-                            MinColumnSpacing="10" 
-                            MinRowSpacing="10" 
-                            Orientation="Horizontal" />
-                    </ItemsRepeater.Layout>
+            <Grid ColumnDefinitions="*, 2, 600" IsVisible="{Binding HasImages}">
+                <Border Grid.Column="0">
+                    <ScrollViewer Margin="10">
+                        <ItemsRepeater 
+                            ItemsSource="{Binding Images}" 
+                            ElementPrepared="OnElementPrepared">
 
-                    <ItemsRepeater.ItemTemplate>
-                        <DataTemplate>
-                            <Image Width="64" Height="64"
-                                Stretch="UniformToFill"
-                                Source="{Binding Preview}" />
-                        </DataTemplate>
-                    </ItemsRepeater.ItemTemplate>
-                </ItemsRepeater>
-            </ScrollViewer>
+                            <ItemsRepeater.Layout>
+                                <UniformGridLayout 
+                                    MinColumnSpacing="10" 
+                                    MinRowSpacing="10" 
+                                    Orientation="Horizontal" />
+                            </ItemsRepeater.Layout>
+        
+                            <ItemsRepeater.ItemTemplate>
+                                <DataTemplate>
+                                    <Image
+                                        Source="{Binding Preview}"
+                                        Stretch="UniformToFill"
+                                        PointerPressed="Image_OnPointerPressed"
+                                        Width="64" 
+                                        Height="64" />
+                                </DataTemplate>
+                            </ItemsRepeater.ItemTemplate>
+                        </ItemsRepeater>
+                    </ScrollViewer>
+                </Border>
+
+                <GridSplitter Grid.Column="1"
+                            Background="#AAAAAA" 
+                            ResizeDirection="Columns"/>
+
+                <Border Grid.Column="2">
+                    <v:SlideshowControl />
+                </Border>
+            </Grid>
         </Panel>
     </DockPanel>
 
