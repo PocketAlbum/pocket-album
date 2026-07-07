@@ -8,10 +8,14 @@
         x:Class="PocketAlbum.Studio.Views.SlideshowControl"
         x:DataType="vm:GalleryViewModel">
 
-    <Image 
-        Source="{Binding SelectedImage.Image}" 
-        MaxWidth="567" 
-        MaxHeight="567" 
-        Margin="10" />
+    <StackPanel>
+        <Image 
+            Source="{Binding SelectedImage.Image}" 
+            MaxWidth="567" 
+            MaxHeight="567" 
+            Margin="10" />
+
+        <Button Margin="10" Click="CastClick">Cast</Button>
+    </StackPanel>
 
 </UserControl>
