@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PocketAlbum.Server\PocketAlbum.Server.csproj" />
     <ProjectReference Include="..\PocketAlbum\PocketAlbum.csproj" />
   </ItemGroup>
 
@@ -30,5 +31,15 @@
     </PackageReference>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
     <PackageReference Include="MessageBox.Avalonia" Version="3.3.1.1" />
+    <PackageReference Include="QRCoder" Version="1.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\ServerWindow.axaml.cs">
+      <DependentUpon>ServerWindow.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\PairWindow.axaml.cs">
+      <DependentUpon>PairWindow.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

@@ -1,0 +1,29 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PocketAlbum.Studio.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="360" d:DesignHeight="200"
+        Width="360" Height="200" CanResize="False"
+        xmlns:controls="clr-namespace:PocketAlbum.Studio.Views"
+        x:Class="PocketAlbum.Studio.Views.PairWindow"
+        x:DataType="vm:PairViewModel"
+        Icon="/Assets/pocket_album_32.png"
+        Title="Pair"
+        WindowStartupLocation="CenterOwner">
+
+    <Design.DataContext>
+        <vm:PairViewModel/>
+    </Design.DataContext>
+
+    <StackPanel Orientation="Vertical" Margin="20">
+        <TextBlock Text="New connection request" FontSize="20" />
+        <TextBlock Text="{Binding Request.ClientName}" Margin="10" />
+        <TextBlock Text="Enter connection code:" />
+        <TextBox Text="{Binding Code}" Margin="0,10" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Margin="5" Click="Cancel_Click">Close</Button>
+            <Button Margin="5" Click="Accept_Click">Accept</Button>
+        </StackPanel>
+    </StackPanel>
+</Window>

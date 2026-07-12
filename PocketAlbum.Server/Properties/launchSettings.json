@@ -6,7 +6,7 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "api/albums",
-      "applicationUrl": "http://localhost:5151",
+      "applicationUrl": "http://0.0.0.0:5151",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

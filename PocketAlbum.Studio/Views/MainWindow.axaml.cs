@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -8,6 +9,7 @@ using Avalonia.Platform.Storage;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using PocketAlbum.Models;
+using PocketAlbum.Server.Services;
 using PocketAlbum.SQLite;
 using PocketAlbum.Studio.Core;
 using PocketAlbum.Studio.ViewModels;
@@ -218,6 +220,22 @@ public partial class MainWindow : Window
                 await synchronizer.Start(this);
                 await gvm.OpenAlbum(album, gvm.AlbumPath);
             }
+        }
+    }
+
+    public async void PairClick(object? sender, RoutedEventArgs args)
+    {
+        if (DataContext is GalleryViewModel gvm &&
+            gvm.Album is IAlbum album &&
+            Application.Current is App app)
+        {
+            var host = await app.StartServer(album);
+            
+            ServerWindow window = new ServerWindow()
+            {
+                DataContext = new ServerViewModel(host)
+            };
+            await window.ShowDialog(this);
         }
     }
 }

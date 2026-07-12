@@ -12,6 +12,7 @@ public static class AlbumEndpoints
             .RequireAuthorization();
 
         group.MapGet("/", GetAlbums).AllowAnonymous();
+        group.MapGet("/{albumId:guid}", GetAlbum).AllowAnonymous();
         group.MapGet("/{albumId:guid}/index", GetAlbumIndex);
         group.MapGet("/{albumId:guid}/list", ListImages);
         group.MapGet("/{albumId:guid}/images/{imageId}", GetImage);
@@ -30,6 +31,17 @@ public static class AlbumEndpoints
             .ToList();
 
         return Results.Ok(metaList);
+    }
+
+    private static async Task<IResult> GetAlbum(
+        Guid albumId,
+        AlbumService service)
+    {
+        if (!service.Albums.TryGetValue(albumId, out var album))
+        {
+            return Results.NotFound($"Album with id {albumId} not found");
+        }
+        return Results.Ok(await album.GetMetadata());
     }
 
     private static async Task<IResult> GetAlbumIndex(
