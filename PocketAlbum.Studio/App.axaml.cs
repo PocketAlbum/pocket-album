@@ -1,17 +1,21 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Markup.Xaml;
 using PocketAlbum.Studio.ViewModels;
 using PocketAlbum.Studio.Views;
-using PocketAlbum.Models;
+using PocketAlbum.Server;
+using System.Threading.Tasks;
+using PocketAlbum.Server.Controllers;
+using Avalonia.Threading;
 
 namespace PocketAlbum.Studio;
 
 public partial class App : Application
 {
+    public ServerHost? ServerHost { get; private set; }
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -21,10 +25,6 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            //IAlbum album = await SQLiteAlbum.Open("albumPath");
-
-            // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
-            // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
             desktop.MainWindow = new MainWindow
             {
@@ -45,6 +45,45 @@ public partial class App : Application
         foreach (var plugin in dataValidationPluginsToRemove)
         {
             BindingPlugins.DataValidators.Remove(plugin);
+        }
+    }
+
+    public async Task<ServerHost> StartServer(IAlbum album)
+    {
+        ServerHost = new ServerHost([], AuthService_ConnectionRequest, [ album ]);
+        await ServerHost.Start();
+        return ServerHost;
+    }
+
+    private string AuthService_ConnectionRequest(TokenRequest request)
+    {
+        var codeTask = new TaskCompletionSource<string>();
+        Dispatcher.UIThread.Post(async () =>
+        {
+            var model = new PairViewModel(request);
+            var pairDialog = new PairWindow()
+            {
+                DataContext = model
+            };
+            if (Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                if (await pairDialog.ShowDialog<bool?>(desktop.MainWindow!) == true)
+                {
+                    codeTask.SetResult(model.Code);
+                    return;
+                }
+            }
+            codeTask.SetResult("");
+        });
+        codeTask.Task.Wait();
+        return codeTask.Task.Result;
+    }
+
+    public async Task StopServer()
+    {
+        if (ServerHost != null)
+        {
+            await ServerHost.Stop();
         }
     }
 }

@@ -30,6 +30,7 @@
                 <MenuItem Header="Edit details" Click="EditMetadataClick"/>
                 <MenuItem Header="Import from folder" Click="ImportImagesClick"/>
                 <MenuItem Header="Synchronize with file" Click="SynchronizeClick"/>
+                <MenuItem Header="Pair with remote album" Click="PairClick"/>
             </MenuItem>
         </Menu>
         <Panel>

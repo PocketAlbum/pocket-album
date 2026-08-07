@@ -9,12 +9,30 @@ using System.Text.Json.Serialization;
 
 namespace PocketAlbum.Server;
 
-public class ServerHost(string[] args, List<IAlbum>? preloadedAlbums = null)
+public class ServerHost(
+    string[] args,
+    ConnectionRequestHandler handler,
+    List<IAlbum>? preloadedAlbums = null)
 {
-    WebApplication? app;
-    Task? appTask;
+    public ServerInstance? CurrentInstance;
 
-    public async Task<WebApplication> Start()
+    public event Action? ServerStateChanged;
+
+    public bool IsRunning => CurrentInstance?.IsRunning ?? false;
+
+    public class ServerInstance(WebApplication webApp)
+    {
+        public WebApplication WebApp { get; } = webApp;
+        public IAuthService AuthService { get; } =
+            webApp.Services.GetService(typeof(IAuthService)) as IAuthService ??
+                throw new ArgumentException("No IAuthService found");
+
+        public bool IsRunning =>
+            WebApp.Lifetime.ApplicationStarted.IsCancellationRequested &&
+            !WebApp.Lifetime.ApplicationStopped.IsCancellationRequested;
+    }
+
+    public async Task<ServerInstance> Start()
     {
         var builder = WebApplication.CreateSlimBuilder(args);
 
@@ -69,33 +87,38 @@ public class ServerHost(string[] args, List<IAlbum>? preloadedAlbums = null)
                 };
             });
         builder.Services.AddSingleton<IAuthService, AuthService>();
+        builder.Services.AddSingleton<ConnectionRequestHandler>(handler);
         builder.Services.AddSingleton(new AlbumService(albums));
         builder.Services.AddAuthorization();
 
-        app = builder.Build();
+        var app = builder.Build();
 
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapAlbumEndpoints();
         app.MapAuthEndpoints();
 
-        appTask = app.RunAsync("http://0.0.0.0:0");
+        var task = app.RunAsync("http://0.0.0.0:0");
+        CurrentInstance = new ServerInstance(app);
 
-        return app;
+        ServerStateChanged?.Invoke();
+
+        return CurrentInstance;
     }
 
     public void AwaitShutdown()
     {
-        appTask?.Wait();
+        CurrentInstance?.WebApp.WaitForShutdown();
     }
 
     public async Task Stop()
     {
-        if (app != null)
+        if (CurrentInstance != null)
         {
-            await app.StopAsync();
+            await CurrentInstance.WebApp.StopAsync();
         }
-        app = null;
+        CurrentInstance = null;
+        ServerStateChanged?.Invoke();
     }
 
     private static async Task<IAlbum> LoadAlbumFromSource(string source)
@@ -110,7 +133,6 @@ public class ServerHost(string[] args, List<IAlbum>? preloadedAlbums = null)
         }
         else throw new IOException("File doesn't exist");
     }
-
 }
 
 [JsonSerializable(typeof(TokenRequest))]
