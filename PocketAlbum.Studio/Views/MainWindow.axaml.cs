@@ -9,7 +9,6 @@ using Avalonia.Platform.Storage;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using PocketAlbum.Models;
-using PocketAlbum.Server.Services;
 using PocketAlbum.SQLite;
 using PocketAlbum.Studio.Core;
 using PocketAlbum.Studio.ViewModels;
@@ -45,7 +44,7 @@ public partial class MainWindow : Window
             return;
         }
         try {
-            if (DataContext is GalleryViewModel)
+            if (DataContext is MainWindowViewModel)
             {
                 var path = files.Path.ToString()[7..];
                 await SQLiteAlbum.Create(path, metadata);
@@ -92,21 +91,21 @@ public partial class MainWindow : Window
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed &&
             sender is Image i &&
             i.DataContext is GalleryItem gi &&
-            DataContext is GalleryViewModel gvm &&
-            gvm.SelectedImage?.Id != gi.Id)
+            DataContext is MainWindowViewModel vm &&
+            vm.SelectedImage?.Id != gi.Id)
         {
-            var item = new SlideshowItem(gvm.Album, gi.Id);
+            var item = new SlideshowItem(vm.Album.Current, gi.Id);
             _ = item.EnsureLoadedAsync();
-            gvm.SelectedImage = item;
+            vm.SelectedImage = item;
         }
     }
 
     private async Task OpenAlbum(string path)
     {
-        if (DataContext is GalleryViewModel gvm)
+        if (DataContext is MainWindowViewModel vm)
         {
             var album = await SQLiteAlbum.Open(path);
-            await gvm.OpenAlbum(album, path);
+            await vm.Album.OpenAlbum(album, path);
         }
     }
 
@@ -127,7 +126,7 @@ public partial class MainWindow : Window
 
     public async void ImportImagesClick(object? sender, RoutedEventArgs args)
     {
-        if (DataContext is GalleryViewModel gvm && gvm.Album is IAlbum album)
+        if (DataContext is MainWindowViewModel vm && vm.Album.Current is IAlbum album)
         {
             var folder = await StorageProvider.OpenFolderPickerAsync(
                 new FolderPickerOpenOptions { Title = "Select images to import" });
@@ -138,13 +137,13 @@ public partial class MainWindow : Window
             var path = folder.Single().Path.ToString().Substring(8);
             RecursiveFilesImporter importer = new RecursiveFilesImporter(path, album);
             await importer.Start(this);
-            await gvm.OpenAlbum(album, gvm.AlbumPath);
+            await vm.Album.OpenAlbum(album, vm.Album.AlbumPath);
         }
     }
 
     public async void EditMetadataClick(object? sender, RoutedEventArgs args)
     {
-        if (DataContext is GalleryViewModel gvm && gvm.Album is IAlbum album)
+        if (DataContext is MainWindowViewModel vm && vm.Album.Current is IAlbum album)
         {
             var metadata = await album.GetMetadata();
             MetadataWindow window = new MetadataWindow()
@@ -174,15 +173,15 @@ public partial class MainWindow : Window
 
     public async void CloseAlbumClick(object? sender, RoutedEventArgs args)
     {
-        if (DataContext is GalleryViewModel gvm)
+        if (DataContext is MainWindowViewModel vm)
         {
-            await gvm.CloseAlbum();
+            await vm.Album.CloseAlbum();
         }
     }
 
     public async void ShowStatisticsClick(object? sender, RoutedEventArgs args)
     {
-        if (DataContext is GalleryViewModel gvm && gvm.Album is IAlbum album) {
+        if (DataContext is MainWindowViewModel vm && vm.Album.Current is IAlbum album) {
             AlbumStatisticsWindow window = new AlbumStatisticsWindow()
             {
                 DataContext = await AlbumStatisticsViewModel.FromAlbum(album)
@@ -202,7 +201,7 @@ public partial class MainWindow : Window
 
     public async void SynchronizeClick(object? sender, RoutedEventArgs args)
     {
-        if (DataContext is GalleryViewModel gvm && gvm.Album is IAlbum album)
+        if (DataContext is MainWindowViewModel vm && vm.Album.Current is IAlbum album)
         {
             var file = await StorageProvider.OpenFilePickerAsync(
                 new FilePickerOpenOptions { 
@@ -218,15 +217,15 @@ public partial class MainWindow : Window
             {
                 AlbumSynchronizer synchronizer = new AlbumSynchronizer(album, otherAlbum);
                 await synchronizer.Start(this);
-                await gvm.OpenAlbum(album, gvm.AlbumPath);
+                await vm.Album.OpenAlbum(album, vm.Album.AlbumPath);
             }
         }
     }
 
     public async void PairClick(object? sender, RoutedEventArgs args)
     {
-        if (DataContext is GalleryViewModel gvm &&
-            gvm.Album is IAlbum album &&
+        if (DataContext is MainWindowViewModel vm &&
+            vm.Album.Current is IAlbum album &&
             Application.Current is App app)
         {
             var host = await app.StartServer(album);

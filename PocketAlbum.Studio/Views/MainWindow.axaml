@@ -6,12 +6,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="450"
         x:Class="PocketAlbum.Studio.Views.MainWindow"
-        x:DataType="vm:GalleryViewModel"
+        x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/pocket_album_32.png"
-        Title="{Binding WindowTitle}">
+        Title="{Binding Album.WindowTitle}">
 
     <Design.DataContext>
-        <vm:GalleryViewModel x:Name="galleryViewModel" />
+        <vm:MainWindowViewModel x:Name="viewModel" />
     </Design.DataContext>
 
     <DockPanel LastChildFill="True">
@@ -34,21 +34,21 @@
             </MenuItem>
         </Menu>
         <Panel>
-            <StackPanel IsVisible="{Binding !HasImages}"
+            <StackPanel IsVisible="{Binding !Album.HasImages}"
                 VerticalAlignment="Center" HorizontalAlignment="Center">
                 <Image Width="64" Height="64"
                     Source="avares://PocketAlbum.Studio/Assets/pocket_album_64.png" />
                 <TextBlock 
-                    Text="{Binding StatusString}" FontSize="16" 
+                    Text="{Binding Album.StatusString}" FontSize="16" 
                     HorizontalAlignment="Center" Margin="10" />
-                <ProgressBar Value="{Binding Progress}" Maximum="1" 
-                    IsVisible="{Binding HasProgress}" />
+                <ProgressBar Value="{Binding Album.Progress}" Maximum="1" 
+                    IsVisible="{Binding Album.HasProgress}" />
             </StackPanel>
-            <Grid ColumnDefinitions="*, 2, 600" IsVisible="{Binding HasImages}">
+            <Grid ColumnDefinitions="*, 2, 600" IsVisible="{Binding Album.HasImages}">
                 <Border Grid.Column="0">
                     <ScrollViewer Margin="10">
                         <ItemsRepeater 
-                            ItemsSource="{Binding Images}" 
+                            ItemsSource="{Binding Album.Images}" 
                             ElementPrepared="OnElementPrepared">
 
                             <ItemsRepeater.Layout>

@@ -28,7 +28,7 @@ public partial class App : Application
             DisableAvaloniaDataAnnotationValidation();
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new GalleryViewModel(),
+                DataContext = new MainWindowViewModel(new Services.AlbumService())
             };
         }
 

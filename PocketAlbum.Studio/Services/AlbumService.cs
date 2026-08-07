@@ -1,20 +1,18 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using PocketAlbum.Studio.ViewModels;
 
-namespace PocketAlbum.Studio.ViewModels;
+namespace PocketAlbum.Studio.Services;
 
-public partial class GalleryViewModel : ObservableObject
+public partial class AlbumService : ObservableObject
 {
     [ObservableProperty]
     private IReadOnlyList<GalleryItem>? images;
 
-    [ObservableProperty]
-    private SlideshowItem? selectedImage;
+    public IAlbum? Current;
 
-    public IAlbum? Album;
-
-    public bool HasImages => Album != null && (Images?.Count ?? 0) > 0;
+    public bool HasImages => Current != null && (Images?.Count ?? 0) > 0;
 
     public string AlbumPath = "";
 
@@ -33,7 +31,7 @@ public partial class GalleryViewModel : ObservableObject
             {
                 return "Opening album";
             }
-            if (Album == null)
+            if (Current == null)
             {
                 return "No album opened";
             }
@@ -44,7 +42,7 @@ public partial class GalleryViewModel : ObservableObject
             return "Ok";
         }
     }
-
+    
     public async Task OpenAlbum(IAlbum album, string path)
     {
         await CloseAlbum();
@@ -60,7 +58,7 @@ public partial class GalleryViewModel : ObservableObject
         Progress = 0.9;
         Images = await ObservableAlbum.FromAlbum(album, new Models.FilterModel());
 
-        Album = album;
+        Current = album;
         AlbumPath = path;
         Progress = null;
         OnPropertyChanged(nameof(HasProgress));
@@ -71,9 +69,9 @@ public partial class GalleryViewModel : ObservableObject
 
     internal async Task CloseAlbum()
     {
-        if (Album != null) {
-            await Album.DisposeAsync();
-            Album = null;
+        if (Current != null) {
+            await Current.DisposeAsync();
+            Current = null;
         }
         Images = null;
         AlbumPath = "";
