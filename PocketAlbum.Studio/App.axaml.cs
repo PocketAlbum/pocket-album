@@ -9,12 +9,29 @@ using PocketAlbum.Server;
 using System.Threading.Tasks;
 using PocketAlbum.Server.Controllers;
 using Avalonia.Threading;
+using Microsoft.Extensions.DependencyInjection;
+using PocketAlbum.Studio.Services;
 
 namespace PocketAlbum.Studio;
 
 public partial class App : Application
 {
     public ServerHost? ServerHost { get; private set; }
+
+    ServiceProvider Services;
+
+    public App()
+    {
+        var services = new ServiceCollection();
+
+        // Services
+        services.AddSingleton<AlbumService>();
+
+        // View models
+        services.AddTransient<MainWindowViewModel>();
+
+        Services = services.BuildServiceProvider();
+    }
 
     public override void Initialize()
     {
@@ -28,7 +45,7 @@ public partial class App : Application
             DisableAvaloniaDataAnnotationValidation();
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(new Services.AlbumService())
+                DataContext = Services.GetService<MainWindowViewModel>()
             };
         }
 

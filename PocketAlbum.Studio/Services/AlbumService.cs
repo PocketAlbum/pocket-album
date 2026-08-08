@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using PocketAlbum.Studio.ViewModels;
 
@@ -14,14 +17,18 @@ public partial class AlbumService : ObservableObject
 
     public bool HasImages => Current != null && (Images?.Count ?? 0) > 0;
 
-    public string AlbumPath = "";
+    [ObservableProperty]
+    private string albumPath = "";
 
     [ObservableProperty]
     private double? progress;
 
+    [ObservableProperty]
+    private bool isOpened;
+
     public bool HasProgress => Progress.HasValue;
 
-    public string WindowTitle => $"PocketAlbum Studio {PocketAlbumConstants.VersionString}{(AlbumPath != "" ? "  -  " : "")}{AlbumPath}";
+    public Bitmap SourceIcon => GetSourceIcon();
 
     public string StatusString
     {
@@ -61,10 +68,10 @@ public partial class AlbumService : ObservableObject
         Current = album;
         AlbumPath = path;
         Progress = null;
+        IsOpened = true;
         OnPropertyChanged(nameof(HasProgress));
         OnPropertyChanged(nameof(HasImages));
         OnPropertyChanged(nameof(StatusString));
-        OnPropertyChanged(nameof(WindowTitle));
     }
 
     internal async Task CloseAlbum()
@@ -75,8 +82,14 @@ public partial class AlbumService : ObservableObject
         }
         Images = null;
         AlbumPath = "";
+        IsOpened = false;
         OnPropertyChanged(nameof(HasImages));
         OnPropertyChanged(nameof(StatusString));
-        OnPropertyChanged(nameof(WindowTitle));
+    }
+
+    public Bitmap GetSourceIcon()
+    {
+        var uri = new Uri("avares://PocketAlbum.Studio/Assets/MDI/database_black_24.png");
+        return new Bitmap(AssetLoader.Open(uri));
     }
 }

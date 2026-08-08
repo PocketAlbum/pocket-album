@@ -5,10 +5,8 @@ using PocketAlbum.Models;
 
 namespace PocketAlbum.Studio.ViewModels;
 
-public partial class AlbumStatisticsViewModel : ViewModelBase
+public partial class AlbumStatisticsViewModel() : ViewModelBase
 {
-    public required IAlbum Album { get; init; }
-
     public required MetadataModel Metadata { get; init; }
 
     public required List<YearStatistics> Years { get; init; }
@@ -33,7 +31,6 @@ public partial class AlbumStatisticsViewModel : ViewModelBase
         }
 
         return new AlbumStatisticsViewModel() {
-            Album = album,
             Metadata = await album.GetMetadata(),
             Years = years
         };

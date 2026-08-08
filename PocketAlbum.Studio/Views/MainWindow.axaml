@@ -8,10 +8,10 @@
         x:Class="PocketAlbum.Studio.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/pocket_album_32.png"
-        Title="{Binding Album.WindowTitle}">
+        Title="{Binding WindowTitle}">
 
     <Design.DataContext>
-        <vm:MainWindowViewModel x:Name="viewModel" />
+        <vm:MainWindowViewModel />
     </Design.DataContext>
 
     <DockPanel LastChildFill="True">
@@ -33,6 +33,17 @@
                 <MenuItem Header="Pair with remote album" Click="PairClick"/>
             </MenuItem>
         </Menu>
+        <Border DockPanel.Dock="Bottom" BorderThickness="0,2,0,0" BorderBrush="LightGray" 
+                Height="24">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding Album.StatusString}" FontSize="12" Margin="2"
+                           IsVisible="{Binding !Album.IsOpened}" />
+                <Image Width="16" Height="16" Source="{Binding Album.SourceIcon}" 
+                       IsVisible="{Binding Album.IsOpened}" Margin="10,0,0,1" />
+                <TextBlock Text="{Binding Album.AlbumPath}" FontSize="12" Margin="2"
+                           IsVisible="{Binding Album.IsOpened}" />
+            </StackPanel>
+        </Border>
         <Panel>
             <StackPanel IsVisible="{Binding !Album.HasImages}"
                 VerticalAlignment="Center" HorizontalAlignment="Center">
