@@ -15,7 +15,7 @@ public partial class ServerWindow : Window
     {
         if (DataContext is ServerViewModel svm)
         {
-            await svm.ServerHost.Stop();
+            await svm.Server.Host.Stop();
         }
     }
 
@@ -23,7 +23,7 @@ public partial class ServerWindow : Window
     {
         if (DataContext is ServerViewModel svm)
         {
-            await svm.ServerHost.Start();
+            await svm.Server.Host.Start();
         }
     }
 }

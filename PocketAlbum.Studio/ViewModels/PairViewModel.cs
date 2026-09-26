@@ -1,4 +1,3 @@
-using PocketAlbum.Server;
 using PocketAlbum.Server.Controllers;
 
 namespace PocketAlbum.Studio.ViewModels;

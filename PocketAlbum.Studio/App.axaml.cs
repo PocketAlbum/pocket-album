@@ -6,9 +6,6 @@ using Avalonia.Markup.Xaml;
 using PocketAlbum.Studio.ViewModels;
 using PocketAlbum.Studio.Views;
 using PocketAlbum.Server;
-using System.Threading.Tasks;
-using PocketAlbum.Server.Controllers;
-using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using PocketAlbum.Studio.Services;
 
@@ -18,7 +15,7 @@ public partial class App : Application
 {
     public ServerHost? ServerHost { get; private set; }
 
-    ServiceProvider Services;
+    public readonly ServiceProvider Services;
 
     public App()
     {
@@ -26,9 +23,11 @@ public partial class App : Application
 
         // Services
         services.AddSingleton<AlbumService>();
+        services.AddSingleton<ServerService>();
 
         // View models
         services.AddTransient<MainWindowViewModel>();
+        services.AddTransient<ServerViewModel>();
 
         Services = services.BuildServiceProvider();
     }
@@ -62,45 +61,6 @@ public partial class App : Application
         foreach (var plugin in dataValidationPluginsToRemove)
         {
             BindingPlugins.DataValidators.Remove(plugin);
-        }
-    }
-
-    public async Task<ServerHost> StartServer(IAlbum album)
-    {
-        ServerHost = new ServerHost([], AuthService_ConnectionRequest, [ album ]);
-        await ServerHost.Start();
-        return ServerHost;
-    }
-
-    private string AuthService_ConnectionRequest(TokenRequest request)
-    {
-        var codeTask = new TaskCompletionSource<string>();
-        Dispatcher.UIThread.Post(async () =>
-        {
-            var model = new PairViewModel(request);
-            var pairDialog = new PairWindow()
-            {
-                DataContext = model
-            };
-            if (Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                if (await pairDialog.ShowDialog<bool?>(desktop.MainWindow!) == true)
-                {
-                    codeTask.SetResult(model.Code);
-                    return;
-                }
-            }
-            codeTask.SetResult("");
-        });
-        codeTask.Task.Wait();
-        return codeTask.Task.Result;
-    }
-
-    public async Task StopServer()
-    {
-        if (ServerHost != null)
-        {
-            await ServerHost.Stop();
         }
     }
 }

@@ -1,6 +1,7 @@
 using Avalonia.Media.Imaging;
 using PocketAlbum.Server;
 using PocketAlbum.Server.Controllers;
+using PocketAlbum.Studio.Services;
 using QRCoder;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,20 +12,22 @@ namespace PocketAlbum.Studio.ViewModels;
 
 internal class ServerViewModel : ViewModelBase
 {
-    public ServerViewModel() : this(new ServerHost([], null))
+    public ServerViewModel() : this(new ServerService(new AlbumService()))
     {
 
     }
 
-    public ServerViewModel(ServerHost serverHost)
+    public ServerViewModel(ServerService serverService)
     {
-        ServerHost = serverHost;
-        ServerHost.ServerStateChanged += ServerHost_ServerStateChanged;
-        if (ServerHost.CurrentInstance is ServerHost.ServerInstance inst)
+        Server = serverService;
+        Server.ServerStateChanged += ServerHost_ServerStateChanged;
+        if (Server.Host.CurrentInstance is ServerHost.ServerInstance inst)
         {
             inst.AuthService.ClientsChanged += AuthService_ClientsChanged;
         }
     }
+
+    public ServerService Server { get; }
 
     private void AuthService_ClientsChanged()
     {
@@ -37,30 +40,28 @@ internal class ServerViewModel : ViewModelBase
         OnPropertyChanged(new PropertyChangedEventArgs(nameof(ServerRunning)));
         OnPropertyChanged(new PropertyChangedEventArgs(nameof(ServerStatus)));
         OnPropertyChanged(new PropertyChangedEventArgs(nameof(Clients)));
-        if (ServerHost.CurrentInstance is ServerHost.ServerInstance inst)
+        if (Server.Host.CurrentInstance is ServerHost.ServerInstance inst)
         {
             inst.AuthService.ClientsChanged += AuthService_ClientsChanged;
         }
     }
 
-    public ServerHost ServerHost { get; }
-
     public ServerInfo? ServerInfo
     {
         get
         {
-            var urls = ServerHost.CurrentInstance?.WebApp.Urls;
-            return ServerHost.CurrentInstance?.AuthService.GetServerInfo(urls!);
+            var urls = Server.Host.CurrentInstance?.WebApp.Urls;
+            return Server.Host.CurrentInstance?.AuthService.GetServerInfo(urls!);
         }
     }
 
     public Bitmap? ServerInfoQr => GenerateQrCode(JsonSerializer.Serialize(ServerInfo));
 
-    public bool ServerRunning => ServerHost.IsRunning;
+    public bool ServerRunning => Server.IsRunning;
 
     public string ServerStatus => ServerRunning ? "Running" : "Stopped";
 
-    public IList<string> Clients => ServerHost.CurrentInstance?.AuthService.Clients ?? [];
+    public IList<string> Clients => Server.Host.CurrentInstance?.AuthService.Clients ?? [];
 
     private static Bitmap GenerateQrCode(string text)
     {

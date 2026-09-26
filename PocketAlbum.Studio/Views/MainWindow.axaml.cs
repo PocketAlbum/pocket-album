@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using Microsoft.Extensions.DependencyInjection;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using PocketAlbum.Models;
@@ -224,15 +224,14 @@ public partial class MainWindow : Window
 
     public async void PairClick(object? sender, RoutedEventArgs args)
     {
-        if (DataContext is MainWindowViewModel vm &&
-            vm.Album.Current is IAlbum album &&
-            Application.Current is App app)
+        if (DataContext is MainWindowViewModel vm && vm.Album.IsOpened &&
+            App.Current is App app)
         {
-            var host = await app.StartServer(album);
+            await vm.Server.StartServer();
             
             ServerWindow window = new ServerWindow()
             {
-                DataContext = new ServerViewModel(host)
+                DataContext = app.Services.GetService<ServerViewModel>()
             };
             await window.ShowDialog(this);
         }
