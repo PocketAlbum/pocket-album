@@ -1,8 +1,10 @@
 using Avalonia.Media.Imaging;
+using Microsoft.Extensions.DependencyInjection;
 using PocketAlbum.Server;
 using PocketAlbum.Server.Controllers;
 using PocketAlbum.Studio.Services;
 using QRCoder;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -12,10 +14,12 @@ namespace PocketAlbum.Studio.ViewModels;
 
 internal class ServerViewModel : ViewModelBase
 {
-    public ServerViewModel() : this(new ServerService(new AlbumService()))
-    {
+    public ServerViewModel() : this(App.GetServices())
+    { }
 
-    }
+    private ServerViewModel(IServiceProvider services) : this(
+        services.GetRequiredService<ServerService>()) 
+    { }
 
     public ServerViewModel(ServerService serverService)
     {

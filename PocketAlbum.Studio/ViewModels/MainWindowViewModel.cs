@@ -1,14 +1,20 @@
+using System;
 using System.ComponentModel;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Extensions.DependencyInjection;
 using PocketAlbum.Studio.Services;
 
 namespace PocketAlbum.Studio.ViewModels;
 
 public partial class MainWindowViewModel : ObservableObject
 {
-    public MainWindowViewModel() : 
-        this(new AlbumService(), new ServerService(new AlbumService())) 
+    public MainWindowViewModel() : this(App.GetServices())
+    { }
+
+    private MainWindowViewModel(IServiceProvider services) : this(
+        services.GetRequiredService<AlbumService>(),
+        services.GetRequiredService<ServerService>()) 
     { }
 
     public MainWindowViewModel(AlbumService albumService, ServerService serverService)

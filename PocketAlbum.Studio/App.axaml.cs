@@ -15,9 +15,9 @@ public partial class App : Application
 {
     public ServerHost? ServerHost { get; private set; }
 
-    public readonly ServiceProvider Services;
+    public readonly ServiceProvider Services = GetServices();
 
-    public App()
+    public static ServiceProvider GetServices()
     {
         var services = new ServiceCollection();
 
@@ -29,7 +29,7 @@ public partial class App : Application
         services.AddTransient<MainWindowViewModel>();
         services.AddTransient<ServerViewModel>();
 
-        Services = services.BuildServiceProvider();
+        return services.BuildServiceProvider();
     }
 
     public override void Initialize()
