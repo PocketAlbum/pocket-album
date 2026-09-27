@@ -27,6 +27,10 @@ public class ServerHost(
             webApp.Services.GetService(typeof(IAuthService)) as IAuthService ??
                 throw new ArgumentException("No IAuthService found");
 
+        public PublicService PublicService { get; } =
+            webApp.Services.GetService(typeof(PublicService)) as PublicService ??
+                throw new ArgumentException("No PublicService found");
+
         public bool IsRunning =>
             WebApp.Lifetime.ApplicationStarted.IsCancellationRequested &&
             !WebApp.Lifetime.ApplicationStopped.IsCancellationRequested;
@@ -89,6 +93,7 @@ public class ServerHost(
         builder.Services.AddSingleton<IAuthService, AuthService>();
         builder.Services.AddSingleton<ConnectionRequestHandler>(handler);
         builder.Services.AddSingleton(new AlbumService(albums));
+        builder.Services.AddSingleton<PublicService>();
         builder.Services.AddAuthorization();
 
         var app = builder.Build();
@@ -96,6 +101,7 @@ public class ServerHost(
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapAlbumEndpoints();
+        app.MapPublicEndpoints();
         app.MapAuthEndpoints();
 
         var task = app.RunAsync("http://0.0.0.0:0");
