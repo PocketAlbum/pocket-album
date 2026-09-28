@@ -22,10 +22,12 @@ public partial class App : Application
         // Services
         services.AddSingleton<AlbumService>();
         services.AddSingleton<ServerService>();
+        services.AddSingleton<CastingService>();
 
         // View models
         services.AddTransient<MainWindowViewModel>();
         services.AddTransient<ServerViewModel>();
+        services.AddTransient<CastViewModel>();
 
         return services.BuildServiceProvider();
     }

@@ -1,0 +1,42 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PocketAlbum.Studio.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="360" d:DesignHeight="300"
+        Width="360" Height="300" CanResize="False"
+        xmlns:controls="clr-namespace:PocketAlbum.Studio.Views"
+        x:Class="PocketAlbum.Studio.Views.CastWindow"
+        x:DataType="vm:CastViewModel"
+        Icon="/Assets/pocket_album_32.png"
+        Title="Pair"
+        WindowStartupLocation="CenterOwner"
+        xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia">
+
+    <Design.DataContext>
+        <vm:CastViewModel/>
+    </Design.DataContext>
+
+    <StackPanel Orientation="Vertical" Margin="20">
+        <TextBlock Text="Select the casting target" FontSize="20" />
+        <Button Background="White" Width="24" Height="24" Click="Refresh_Click">
+            <mi:MaterialIcon Kind="Refresh" Width="16" Height="16" />
+        </Button>
+        <ListBox ItemsSource="{Binding Receivers}" Height="180" 
+                 DoubleTapped="ListBox_DoubleTapped"
+                 SelectedItem="{Binding SelectedReceiver}" >
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <mi:MaterialIcon Kind="Television" Width="16" Height="16" />
+                        <TextBlock Text="{Binding Name}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox> 
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Margin="5" Click="Cancel_Click">Close</Button>
+            <Button Margin="5" Click="Accept_Click">Accept</Button>
+        </StackPanel>
+    </StackPanel>
+</Window>

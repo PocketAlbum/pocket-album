@@ -22,6 +22,15 @@ public partial class MainWindow : Window
         InitializeComponent();
     }
 
+    protected override void OnDataContextChanged(EventArgs e)
+    {
+        base.OnDataContextChanged(e);
+        if (DataContext is MainWindowViewModel mwvm)
+        {
+            mwvm.Casting.ChromecastSelectionCallback = ChromecastSelection;
+        }
+    }
+
     public async void NewAlbumClick(object sender, RoutedEventArgs args)
     {
         MetadataWindow window = new MetadataWindow()
@@ -94,9 +103,7 @@ public partial class MainWindow : Window
             DataContext is MainWindowViewModel vm &&
             vm.SelectedImage?.Id != gi.Id)
         {
-            var item = new SlideshowItem(vm.Album.Current, gi.Id);
-            _ = item.EnsureLoadedAsync();
-            vm.SelectedImage = item;
+            vm.SelectImage(gi.Id);
         }
     }
 
@@ -232,6 +239,18 @@ public partial class MainWindow : Window
             ServerWindow window = new ServerWindow()
             {
                 DataContext = app.Services.GetService<ServerViewModel>()
+            };
+            await window.ShowDialog(this);
+        }
+    }
+
+    private async Task ChromecastSelection()
+    {
+        if (App.Current is App app) 
+        {
+            CastWindow window = new CastWindow()
+            {
+                DataContext = app.Services.GetService<CastViewModel>()
             };
             await window.ShowDialog(this);
         }
